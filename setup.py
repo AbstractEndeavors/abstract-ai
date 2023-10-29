@@ -10,7 +10,7 @@ setuptools.setup(
     description="abstract_ai is a Python module that provides a wide range of functionalities aimed at facilitating and enhancing interactions with AI. Developed by putkoff, it comprises several utility modules to help handle API responses, generate requests, manage tokenization, and deal with other related aspects.",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/AbstractEndeavors/abstract_essentials/tree/main/abstract_ai',
+    url='https://github.com/AbstractEndeavors/abstract_ai',
     classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
