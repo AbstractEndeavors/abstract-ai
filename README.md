@@ -31,7 +31,7 @@
 
 ## Overview
 
-`api_calls.py` serves as a bridge between your application and the OpenAI GPT-3 API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.
+`api_calls.py` serves as a bridge between your application and the OpenAI GPT API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.
 
 ## Images
 
