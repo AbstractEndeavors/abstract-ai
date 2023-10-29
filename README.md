@@ -29,27 +29,25 @@
 - [Contact](#contact)
 - [License](#license)
 
-Please note that I have included the "Abstract AI Module" section in the table of contents to provide a clear structure for your README. You can use this updated table of contents to organize your README accordingly.
-
 ## Overview
 
 `api_calls.py` serves as a bridge between your application and the OpenAI GPT-3 API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.
 
 ## Images
 
-![URL Grabber Component](src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
+![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
 
 *URL grabber component: Allows users to add URL source code or specific portions of the URL source code to the prompt data.*
 
-![Settings Tab](src/abstract_ai/documentation/images/settings_tab.png)
+![Settings Tab](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/settings_tab.png)
 
 *Settings Tab: Contains all selectable settings, including available, desired, and used prompt and completion tokens.*
 
-![Instructions Display](src/abstract_ai/documentation/images/instructions_display.png)
+![Instructions Display](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/instructions_display.png)
 
 *Instructions Display: Showcases all default instructions, which are customizable in the same pane. All instructions are derived from the `instruction_manager` class.*
 
-![File Content Chunks](src/abstract_ai/documentation/images/file_content_chunks.png)
+![File Content Chunks](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/file_content_chunks.png)
 
 *File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
 
