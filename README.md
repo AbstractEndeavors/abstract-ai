@@ -136,7 +136,7 @@ Focuses on prompts and their processing, determining token distribution and coun
 
 ## Contact
 
-For issues, suggestions, or contributions, open a new issue on our [Github repository](https://github.com/AbstractEndeavors/abstract_ai](https://github.com/AbstractEndeavors/abstract-ai/).
+For issues, suggestions, or contributions, open a new issue on our [Github repository](https://github.com/AbstractEndeavors/abstract-ai/).
 
 ## License
 
