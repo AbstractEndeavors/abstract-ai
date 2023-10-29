@@ -250,7 +250,7 @@ def get_grouped_tabs_left():
                 ]
 def get_grouped_tabs_right():
     return [[
-                 make_component("Tab",'SETTINGS', get_settings(),**expandable()),
+                 make_component("Tab",'SETTINGS', ensure_nested_list(make_component("Column",get_settings(),**expandable(scroll_vertical=True,scroll_horizontal=True))),**expandable(scroll_horizontal=True)),
                  make_component("Tab",'RESPONSES', abstract_browser_layout(section='responses'),key=text_to_key(text='response tab'),**expandable()),
                  make_component("Tab",'Files', abstract_browser_layout(section='files'),**expandable(),key=text_to_key(text='file tab')),
                  make_component("Tab",'urls', get_urls(),**expandable(),key=text_to_key(text='url tab'))
