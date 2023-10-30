@@ -50,7 +50,8 @@ def get_model_selection_layout():
 ### input output     
 def get_input_output():
     return [
-        [make_component("Frame",'Response',layout=[[make_component('Multiline',key=text_to_key(text='-RESPONSE-'),**expandable(size=(160, None)))]]),make_component("Column",get_feedback())]
+        [make_component("Frame",'Response',layout=[[make_component('Multiline',key=text_to_key(text='-RESPONSE-'),**expandable(size=(130, None)))]]),make_component("Column",get_feedback())]
+        
     ]
 def get_input_output_layout():
     return [
@@ -98,11 +99,13 @@ def make_feedback_frame(text_list):
         else:
             component = make_component("Multiline",key=text_to_key(text=title,section='feedback'),size=(30, 5))
         layout.append([make_component('Frame',title, layout=[[component]],key=text_to_key(text=title,section='feedback frame'))])
-        
+    layout.append([make_component('Frame',"response nav",[[make_component("Button",button_text="<-",key=text_to_key("response text back"),enable_events=True),
+                                                           make_component("input",default_text='0',key=text_to_key("response text number"),size=(4,1)),
+                                                           make_component("Button",button_text="->",key=text_to_key("response text forward"),enable_events=True)]])])
     return layout
 def get_feedback():
     return [
-        make_component("Column",ensure_nested_list(make_feedback_frame(('suggestions', 'notation','abort','additional_responses','other'))))
+        make_component("Column",ensure_nested_list(make_feedback_frame(('suggestions', 'notation','other'))))
         ]
 """
     layout = 
@@ -152,7 +155,7 @@ def get_settings():
     content_type_combo=ensure_nested_list(make_component("Combo",values=content_type_list(), default_value=content_type_list()[0], key=text_to_key(text='content type'), enable_events=True))
     default_checkboxes=([[make_default_checkbox('additional Responses'),make_default_checkbox('Abort')],[make_default_checkbox('additional instruction'),make_default_checkbox('notation'),make_default_checkbox('suggestions')]])
     file_options = ensure_nested_list([[make_component("Checkbox",'auto chunk title',default=True,key=text_to_key('auto chunk title'), enable_events=True),make_component("Checkbox",'reuse chunk data',default=False,key='-REUSE_CHUNK-'),make_component("Checkbox",'append',default=True,key='-APPEND_CHUNK-'),make_component("Checkbox",'all directory',default=True,key='-SCAN_MODE_ALL-')]])
-    test_options= ensure_nested_list([[make_component("Checkbox",'Test Run',default=False,key=text_to_key(text='test run'), enable_events=True),make_component("Input",key=text_to_key(text='test file'), enable_events=True),make_component("FileBrowse","Files", enable_events=True, key=text_to_key(text='test browse'))]])
+    test_options= ensure_nested_list([[make_component("Checkbox",'Test Run',default=False,key=text_to_key(text='test run'), enable_events=True),make_component("Checkbox",'Test Files',default=False,key=text_to_key(text='test files'), enable_events=True),make_component("Input",key=text_to_key(text='test file'), enable_events=True),make_component("FileBrowse","Files", enable_events=True, key=text_to_key(text='test browse'))]])
     return [
             [make_component("Frame",'completion percentage',layout=completion_percentage),
              make_component("Frame",'prompt percentage',layout=prompt_percentage),
@@ -277,7 +280,7 @@ def get_output_options():
          make_component("Button",button_text="COPY RESPONSE",key='-COPY_RESPONSE-', disabled=False,enable_evete=True),
          make_component("Button",button_text="PASTE INPUT",key='-PASTE_INPUT-', disabled=False,enable_evete=True),
          make_component("Button",button_text="CLEAR CHUNKS",key='-CLEAR_CHUNKS-', disabled=False,enable_evete=True),
-         make_component("Button",button_text="UNDOI CHUNKS",key='-UNDO_CHUNKS-', disabled=False,enable_evete=True),
+         make_component("Button",button_text="UNDO CHUNKS",key='-UNDO_CHUNKS-', disabled=False,enable_evete=True),
          make_component("Button",button_text="REDO CHUNKS",key='-REDO_CHUNKS-', disabled=False,enable_evete=True)],
          
     ]
@@ -290,7 +293,7 @@ def get_total_layout():
     tab_group_bottom.append(make_component("Column",get_tabs_layout(get_tab_group(get_grouped_tabs_right()))))
     return [
         [[make_component("Frame",'PROGRESS',layout=[[
-        make_component("Text",'Not Sending',key='-PROGRESS_TEXT-', auto_size_text=True),
+        make_component("InputText",'Not Sending',key='-PROGRESS_TEXT-',background_color="light blue", auto_size_text=True,size=(15,1)),
         make_component("ProgressBar",100, orientation='h', size=(20, 20), key='-PROGRESS-'),
         make_component("Input",default_text='0',key=text_to_key("query count"),auto_size_text=True, disabled= True,enable_events=True),
         make_component("Frame",'query title',layout=[[make_component("Input",default_text="title of prompt",size=(40,1), key=text_to_key('title input'))]])]]),

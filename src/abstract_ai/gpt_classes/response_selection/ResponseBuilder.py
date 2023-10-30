@@ -335,12 +335,14 @@ class SaveManager:
         self.directory = mkdirs(directory or os.path.join(os.getcwd(),'response_data'))
         if get_any_key(self.content,'error'):
             self.fold_model= mkdirs(os.path.join(self.directory,self.date,'error'))
-            self.file_name = f'{self.create_unique_title(title=self.title,directory=self.fold_model)}.json'
+            self.title = self.create_unique_title(title=self.title,directory=self.fold_model)
+            self.file_name = f'{self.title}.json'
         
         else:
 
             self.fold_model= mkdirs(os.path.join(self.directory,self.date,self.model))
-            self.file_name = f'{self.create_unique_title(title=self.title,directory=self.fold_model)}.json'
+            self.title = self.create_unique_title(title=self.title,directory=self.fold_model)
+            self.file_name = f'{self.title}.json'
         self.file_path = os.path.join(self.fold_model,self.file_name)
         safe_dump_to_file(file_path=self.file_path,data=self.api_response)
     def create_unique_title(self,title:str=None,directory:str=None):
@@ -426,9 +428,9 @@ class ResponseManager:
         self.query_js={}
         self.query_js["prompt"]=safe_json_loads(self.prompt)
         self.query_js["response"] = safe_json_loads(self.api_response)
-        self.query_js["content"] = safe_json_loads(self.content)
         self.save_manager = SaveManager(api_response=self.api_response,title=self.title,directory=self.directory)
-        self.output.append(self.api_response)
+        self.query_js["title"]=self.save_manager.title
+        self.output.append(self.query_js)
         return self.query_js
     def get_last_response(self):
         self.recent_file = get_highest_value_obj(get_files(self.directory),function=get_file_create_time)

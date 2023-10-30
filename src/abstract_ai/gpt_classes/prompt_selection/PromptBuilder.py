@@ -9,7 +9,7 @@ try:
 except LookupError:
     nltk.download('punkt')
 from nltk.tokenize import word_tokenize
-from abstract_utilities import convert_to_percentage
+from abstract_utilities import convert_to_percentage,eatAll
 from abstract_utilities.type_utils import is_number
 import tiktoken
 encoding = tiktoken.get_encoding("cl100k_base")
@@ -68,25 +68,47 @@ class PromptManager:
         Returns:
             dict: A dictionary containing token distribution information.
         """
-        def count_tokens(text):
-            """
-            Counts the number of tokens in the given text.
-
-            Args:
-                text (str): The input text.
-
-            Returns:
-                int: The number of tokens.
-            """
-            return len(word_tokenize(text))
-
+        
+        def chunk_any_to_tokens(blocks, max_tokens,delimeter=''):
+            # Initialize the function analyzer.
+            chunks=['']
+            for block in blocks:
+                if num_tokens_from_string(block) > max_tokens:
+                    chunks=chunks+chunk_text_by_tokens(block,max_tokens)
+                elif num_tokens_from_string(chunks[-1] + block) > max_tokens:
+                    chunks.append(block)
+                else:
+                    chunks[-1]+= delimeter+block
+            return chunks
+        def clean_chunks(chunks):
+            new_chunks = []
+            for chunk in chunks:
+                chunk_clean=eatAll(chunk,['',' ','\n','\t','.','[]'])
+                if len(chunk_clean)>0:
+                    new_chunks.append(chunk)
+            return new_chunks
+        def chunk_data_by_type(data, max_tokens,chunk_type=None):
+            delimeter=''
+            if chunk_type in ["URL","SOUP"]:
+                delimeter='\n'
+                blocks = re.split(r'<h[1-6].*?>.*?</h[1-6]>', data)
+                blocks = [chunk.strip() for chunk in blocks if chunk.strip()]
+            elif chunk_type == "DOCUMENT":
+                delimeter = "."
+                blocks = data.split(delimeter)
+            elif chunk_type == "CODE":
+                return clean_chunks(chunk_source_code(data,max_tokens))
+            else:
+                delimeter="\n\n"
+                blocks = data.split(delimeter)
+            return clean_chunks(chunk_any_to_tokens(blocks,max_tokens,delimeter))
         def chunk_text_by_tokens(prompt_data, max_tokens):
             # Split prompt_data into chunks based on max_tokens
             chunks = []
             current_chunk = ""
             current_chunk_tokens = 0
 
-            for sentence in prompt_data.split("."):  # Split by sentences for example
+            for sentence in prompt_data.split("\n"):  # Split by sentences for example
                 sentence_tokens = num_tokens_from_string(sentence)
 
                 if current_chunk_tokens + sentence_tokens <= max_tokens:
@@ -101,61 +123,36 @@ class PromptManager:
                 chunks.append(current_chunk)
 
             return chunks
-        def chunk_data_by_type(data, max_tokens, data_type=None):
-            chunks = []
-            current_chunk = ""
-            current_chunk_tokens = 0
-            # Define chunking rules based on data type
-            if data_type == "TEXT":
-                paragraphs = data.split("\n\n")
-                for paragraph in paragraphs:
-                    paragraph_tokens = num_tokens_from_string(paragraph)
-                    if current_chunk_tokens + paragraph_tokens <= max_tokens:
-                        current_chunk += paragraph
-                        current_chunk_tokens += paragraph_tokens
-                    else:
-                        chunks.append(current_chunk)
-                        current_chunk = paragraph
-                        current_chunk_tokens = paragraph_tokens
-            elif data_type == "SCRIPT":
-                blocks = re.split(r'\n\s*}\s*\n', data)
-                for block in blocks:
-                    block_tokens = num_tokens_from_string(block)
-                    if current_chunk_tokens + block_tokens <= max_tokens:
-                        current_chunk += block
-                        current_chunk_tokens += block_tokens
-                    else:
-                        chunks.append(current_chunk)
-                        current_chunk = block
-                        current_chunk_tokens = block_tokens
-            elif data_type == "URL":
-                sections = re.split(r'<h[1-6].*?>.*?</h[1-6]>', data)
-                for section in sections:
-                    section_tokens = num_tokens_from_string(section)
-                    if current_chunk_tokens + section_tokens <= max_tokens:
-                        current_chunk += section
-                        current_chunk_tokens += section_tokens
-                    else:
-                        chunks.append(current_chunk)
-                        current_chunk = section
-                        current_chunk_tokens = section_tokens
-            elif data_type == "SOUP":
-                for tag in tags:
-                    tag_content = str(tag)
-                    tag_tokens = num_tokens_from_string(tag_content)
-                    if current_chunk_tokens + tag_tokens <= max_tokens:
-                        current_chunk += tag_content
-                        current_chunk_tokens += tag_tokens
-                    else:
-                        chunks.append(current_chunk)
-                        current_chunk = tag_content
-                        current_chunk_tokens = tag_tokens
-            else:
-               return chunk_text_by_tokens(data, max_tokens)
+        def extract_functions_and_classes(source_code):
+            functions_and_classes = []
+            
+            # Regular expressions to match function and class definitions
+            func_pattern = re.compile(r'^\s*def\s+\w+\s*\(.*\):')
+            class_pattern = re.compile(r'^\s*class\s+\w+\s*\(.*\):')
+            
+            lines = source_code.splitlines()
+            current_block = []
 
-            if current_chunk:
-                chunks.append(current_chunk)
-
+            for line in lines:
+                
+                if func_pattern.match(line) or class_pattern.match(line):
+                    functions_and_classes.append("\n".join(current_block))
+                    current_block = []
+                current_block.append(line)
+            if current_block:
+                functions_and_classes.append("\n".join(current_block))        
+            return functions_and_classes
+        def chunk_source_code(source_code, max_tokens):
+            # Initialize the function analyzer.
+            chunks=['']
+            functions_and_classes=extract_functions_and_classes(source_code)
+            for block in functions_and_classes:
+                if num_tokens_from_string(block) > max_tokens:
+                    chunks=chunks+chunk_data_by_type(block, max_tokens)
+                elif num_tokens_from_string(chunks[-1] + block) > max_tokens:
+                    chunks.append(block)
+                else:
+                    chunks[-1]+= '\n'+block
             return chunks
         def get_token_calcs(i,chunk_data,total_chunks,initial_prompt_token_length,prompt_token_desired,initial_completion_token_length,completion_token_desired):
             current_chunk_token_length = num_tokens_from_string(str(chunk_data))
@@ -207,33 +204,6 @@ class PromptManager:
                 get_token_distributions.append(chunk_js)
 
             return get_token_distributions
-        def create_chunks(content, chunk_size):
-            """
-            This method is responsible for dividing large chunks of content into smaller, more manageable pieces, each of a specified size.
-            This is done by tokenizing the content, and then appending each token to the current chunk until the chunk reaches the specified size.
-            The list of all chunks is then returned to the caller.
-
-            Parameters:
-            - content (str): The large content that needs to be divided into chunks.
-            - chunk_size (int): The size of each chunk in tokens.
-
-            Returns:
-            - list of str: A list of smaller content chunks.
-            """
-         
-            tokens =  word_tokenize(content)
-            chunks = []
-            current_chunk = []
-            current_size = 0
-            for token in tokens:
-                current_size += 1
-                if current_size > size_per_chunk:
-                    chunks.append(' '.join(current_chunk))
-                    current_chunk = []
-                    current_size = 1
-                current_chunk.append(token)
-            chunks.append(' '.join(current_chunk))
-            return chunks
         tokenize_js={"bot_notation":bot_notation,
             "max_tokens":max_tokens,
             "completion_percentage":completion_percentage,
@@ -285,6 +255,8 @@ class PromptManager:
         Returns:
         - str: A formatted communication guide.
         """
+        def get_delimeters():
+            return '\n-----------------------------------------------------------------------------\n'
         def get_for_prompt(title,data):
             if data:
                 return f'#{title}#'+'\n\n'+f'{data}'
@@ -302,7 +274,7 @@ class PromptManager:
         request=get_for_prompt('prompt',self.request)
         bot_notation=get_for_prompt('notation from the previous response',bot_notation)
         chunks_prompt=get_for_prompt('data chunk',get_chunk_header(chunk,total_chunks,data_chunk))
-        return f'''{instructions}{request}{bot_notation}{chunks_prompt}'''
+        return f'''{get_delimeters()}{instructions}{get_delimeters()}{request}{get_delimeters()}{bot_notation}{get_delimeters()}{chunks_prompt}{get_delimeters()}'''
     def create_prompt(self,dist_number=None,bot_notation=None):
         """
         This method forms a dictionary embodying the prompt for the chatbot. This includes the model name,

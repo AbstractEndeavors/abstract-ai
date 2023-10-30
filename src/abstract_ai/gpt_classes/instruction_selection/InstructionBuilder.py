@@ -86,25 +86,34 @@ class InstructionManager:
             return "if you cannot fullfil the request, return this value True; be sure to leave a notation detailing whythis was"
         return "return false"
     def initialize_instructions(self):
+        {"api_response":"","notation":"","suggestions":"","additional_responses":False,"abort":False,"generate_title":""}
+        self.example_format={}
         if self.additional_instruction:
             if isinstance(self.additional_instruction,dict):
                 self.instruction_js=self.additional_instruction
             elif isinstance(self.additional_instruction,str):
                 self.instruction_js={"additional_instruction":self.additional_instruction}
+                
         else:
             self.instructions_js = {}
         if 'response' not in self.instructions_js and "api_response" not in self.instructions_js:
             self.instructions_js["api_response"]="place response to prompt here"
+            self.example_format["api_response"]=""
         if self.notation or self.test_it:
            self.instructions_js["notation"]=self.get_notation()
+           self.example_format["notation"]=""
         if self.instructions_js or self.test_it:
             self.instructions_js["suggestions"]=self.get_suggestions()
+            self.example_format["suggestions"]=""
         if self.additional_responses or self.test_it:
             self.instructions_js["additional_responses"]=self.get_additional_responses()
+            self.example_format["additional_responses"]="False"
         if self.abort or self.test_it:
             self.instructions_js["abort"]=self.get_abort()
+            self.example_format["abort"]="False"
         if self.generate_title or self.test_it:
             self.instructions_js["generate_title"]= self.get_generate_title()
+            self.example_format["generate_title"]=""
         return self.instructions_js
     def get_instructions(self,instructions_js=None):
         """
@@ -121,4 +130,5 @@ class InstructionManager:
         instructions += '\n'
         for i,key in enumerate(instructions_js.keys()):
             instructions+=f"{i}) {key} - {instructions_js[key]}\n"
+        instructions + '\nbelow is an example of the expected json dictionary response format, with the default inputs:\n' + str(self.example_format)
         return instructions
