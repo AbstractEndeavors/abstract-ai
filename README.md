@@ -66,7 +66,112 @@ To utilize the `api_calls.py` module, install the necessary dependencies and con
 ## Usage
 
 ```python
-from abstract_ai import abstract_ai_gui_main
+import os
+import pyperclip
+from abstract_webtools import UserAgentManager,UrlManager,SafeRequest,url_grabber_component
+from abstract_gui import get_event_key_js,make_component,expandable,AbstractBrowser,text_to_key
+from next_read_manager import NextReadManager
+from window_manager import AbstractWindowManager
+from abstract_ai import get_any_value,ApiManager,ModelManager
+from ResponseBuilder import ResponseManager
+from abstract_ai_gui_layout import get_total_layout,instructions_keys,window_width,window_height,all_token_keys,test_options_keys
+from PromptBuilder import PromptManager
+from InstructionBuilder import InstructionManager
+from abstract_utilities import create_new_name,unified_json_loader,get_sleep,eatAll,safe_json_loads,read_from_file,make_list,ThreadManager,HistoryManager,get_file_create_time,safe_read_from_json
+from abstract_utilities.json_utils import get_any_value
+from file_read.JsonHandler import read_docx,read_from_file_with_multiple_encodings,FileCollator
+from file_read.generate_readme_descriptions import read_me_window
+import schemdraw
+from schemdraw.flow import *
+
+
+with schemdraw.Drawing() as d:
+    d+= Start().label("choose a model")
+    d+= Arrow().down(d.unit/2)
+##ModelBuilder.py
+from abstract_ai import ModelManager
+model='gpt-4'
+model_mgr = ModelManager(input_model_name=model)
+model_mgr.selected_endpoint    #output: https://api.openai.com/v1/chat/completions
+model_mgr.selected_max_tokens  #output: 8192
+
+
+#ApiBuilder.py
+#you can put in either your openai key directly or utilize an env value
+# the env uses abstract_security module, it will automatically search the following folders for a .env to matcha that value
+# - current_directory
+# - home/env_all
+# - documents/env_all
+from abstract_ai import ApiManager
+api_env='OPENAI_API_KEY'
+api_mgr = ApiManager(api_env=api_env,content_type=None,header=None,api_key=None)
+api_mgr.content_type #output application/json
+api_mgr.header       #output: {'Content-Type': 'application/json', 'Authorization': 'Bearer ***private***'}
+api_mgr.api_key      #output: ***private***
+
+
+
+#InstructionBuilder.py
+#Each of these methods, with their signature features, enhances the usability and functionality of the Abstract_AI system,
+#ensuring optimized interactions, easy navigation through data chunks, and adept handling of responses.
+notation = True # allows the module a method of notation that it can utilize to maintain comtext and contenuity from one prompt query to the next
+suggestions = True # encourages suggestions on the users implimentation of the current query
+abort = True # allows for the module to put a full stop to the query loop if the goal is unattainable or an anamolous instance occurs
+generate_title = True # the module wil generate a title for the response file
+additional_responses = True # allows for the module to delegate the relooping of a prompt interval, generally to form a complete response if token length is insuficcient, or if context is too much or too little
+additional_instruction = "please place any iterable data inside of this key value unless otherwise specified"
+request_chunks = True # allows for the module to add an interval to the query loop to retrieve the previous prompt the previous prompt
+instruction_mgr = InstructionManager(notation=notation,
+                                     suggestions=suggestions,
+                                     abort=abort,
+                                     generate_title=generate_title,
+                                     additional_responses=additional_responses,
+                                     additional_instruction=additional_instruction,
+                                     request_chunks=request_chunks)
+
+instruction_mgr.instructions 
+#output:
+"""
+your response is expected to be in JSON format with the keys as follows:
+
+0) api_response - place response to prompt here
+1) notation - A useful parameter that allows a module to retain context and continuity of the prompts. These notations can be used to preserve relevant information or context that should be carried over to subsequent prompts.
+2) suggestions - ': A parameter that allows the module to provide suggestions for improving efficiency in future prompt sequences. These suggestions will be reviewed by the user after the entire prompt sequence is fulfilled.
+3) additional_responses - This parameter, usually set to True when the answer cannot be fully covered within the current token limit, initiates a loop that continues to send the current chunk's prompt until the module returns a False value. This option also enables a module to have access to previous notations
+4) abort - if you cannot fullfil the request, return this value True; be sure to leave a notation detailing whythis was
+5) generate_title - A parameter used for title generation of the chat. To maintain continuity, the generated title for a given sequence is shared with subsequent queries.
+6) request_chunks - you may request that the previous chunk data be prompted again, if selected, the query itterate once more with the previous chunk included in the prompt. return this value as True to impliment this option; leave sufficient notation as to why this was neccisary for the module recieving the next prompt
+7) additional_instruction - please place any iterable data inside of this key value unless otherwise specified
+
+below is an example of the expected json dictionary response format, with the default inputs:
+{'api_response': '', 'notation': '', 'suggestions': '', 'additional_responses': False, 'abort': False, 'generate_title': '', 'request_chunks': False, 'additional_instruction': '...'}"""
+
+
+#PromptBuilder.py
+from abstract_ai import PromptManager
+completion_percentage = 40 #allows the user to specify the completion percentage they are seeking for this prompt(s)
+request = "thanks for using abstract_ai the description youre looking for is in the prompt_data"
+prompt_data = """The code snippet is a part of `PromptBuilder.py` from the `abstract_ai` module. This specific part shows the crucial role of chunking strategies in the functioning of `abstract_ai`.
+\n\nThe `chunk_data_by_type` function takes in data, a maximum token limit, and a type of chunk (with possible values like 'URL', 'SOUP', 'DOCUMENT', 'CODE', 'TEXT').
+Depending on the specified type, it applies different strategies to split the data into chunks. If a chunk type is not detected, the data is split based on line breaks.
+\n\nThe function `chunk_text_by_tokens` is specifically used when the chunk type is 'TEXT'. It chunks the input data based on the specified maximum tokens, ensuring each
+chunk does not exceed this limit.\n\nWith the `chunk_source_code` function, you can chunk source code based on individual functions and classes. This is crucial to maintain
+the context and readability within a code snippet.\n\n`extract_functions_and_classes` is a helper function used within `chunk_source_code`, it extracts all the functions and
+classes from the given source code. The extracted functions and classes are then used to chunk source code accordingly.\n\n
+These functions are called numerous times in the abstract_ai platform, emphasizing their key role in the system."""
+chunk_type="TEXT" #parses the chunks based on your input types, ['HTML','TEXT','CODE']
+prompt_mgr = PromptManager(instruction_mgr=instruction_mgr,
+                           model_mgr=model_mgr,
+                           completion_percentage=completion_percentage,
+                           prompt_data=prompt_data,
+                           request=request,
+                           token_dist=None,
+                           bot_notation=None,
+                           chunk=None,
+                           role=None,
+                           chunk_type=chunk_type)
+input(prompt_mgr.token_dist)
+[{'completion': {'desired': 3276, 'available': 3076, 'used': 200}, 'prompt': {'desired': 4915, 'available': 4035, 'used': 880}, 'chunk': {'number': 0, 'total': 1, 'length': 260, 'data': "\nThe code snippet is a part of `PromptBuilder.py` from the `abstract_ai` module. This specific part shows the crucial role of chunking strategies in the functioning of `abstract_ai`.\n\n\nThe `chunk_data_by_type` function takes in data, a maximum token limit, and a type of chunk (with possible values like 'URL', 'SOUP', 'DOCUMENT', 'CODE', 'TEXT').\nDepending on the specified type, it applies different strategies to split the data into chunks. If a chunk type is not detected, the data is split based on line breaks.\n\n\nThe function `chunk_text_by_tokens` is specifically used when the chunk type is 'TEXT'. It chunks the input data based on the specified maximum tokens, ensuring each\nchunk does not exceed this limit.\n\nWith the `chunk_source_code` function, you can chunk source code based on individual functions and classes. This is crucial to maintain\nthe context and readability within a code snippet.\n\n`extract_functions_and_classes` is a helper function used within `chunk_source_code`, it extracts all the functions and\nclasses from the given source code. The extracted functions and classes are then used to chunk source code accordingly.\n\n\nThese functions are called numerous times in the abstract_ai platform, emphasizing their key role in the system."}}]
 ```
 
 # `abstract_ai` Module
