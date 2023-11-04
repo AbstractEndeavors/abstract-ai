@@ -245,55 +245,99 @@ The `abstract_ai` module is an advanced class management system crafted to seaml
 
 ## GptManager Overview
 
- Dynamic Data Chunking & API Query Handling
-Overview:
+Absolutely, a well-formatted README file can greatly improve the appeal and readability of your GitHub repository. Here's how you might format your project description using Markdown for an aesthetically pleasing GitHub README:
 
-This project showcases a robust code example that demonstrates a highly efficient method for handling and processing large datasets through a dynamic chunking system. Our solution is ideal for API interactions where data size and query limitations are a concern. Users can expect seamless operation with minimal manual intervention required.
+```markdown
+# Dynamic Data Chunking & API Query Handler
 
-Features:
+## Overview
 
-Dual Input Handling: Incorporates two input sections, 'request' and 'prompt data', facilitating easy data entry and manipulation.
+This repository presents a sophisticated code example engineered to efficiently process extensive datasets via an intelligent chunking algorithm, tailored for API interactions where data size and query constraints are predominant. It assures a smooth operation with minimal user input.
 
-Intelligent Chunking Mechanism: Prompt data is automatically segmented into manageable chunks. This process is determined by a user-defined percentage that dictates the expected completion per query against the maximum token capacity.
+## Key Features
 
-Adaptive Query Execution: The response handler, a class dedicated to managing API interactions, conducts iterative queries until the dataset is fully processed.
+### Dual Input System
+- `Request` and `Prompt Data` sections for straightforward data incorporation.
+- Automatic division of prompt data into manageable chunks based on user-specified parameters.
 
-Chunk Management: In scenarios where a document gets split into, for instance, 14 chunks, the system intelligently orchestrates 14 or more queries based on runtime decisions. Each query combines the static request, instructions, and a dynamically allocated chunk of data in a "for each" iteration pattern.
+### Intelligent Chunking
+- Dynamically segments data considering the set percentage for expected completion per API query and the maximum token limit.
+- Executes iterative queries through a response handler class until data processing completes.
 
-Detailed Instruction Handling: Instructions play a critical role as they guide the modules to leverage script functionalities effectively. The setup allows for a variety of actions:
+### Iterative Query Execution
+- Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
 
-bot_notation: Directs the module to annotate each data chunk, aiding context retention across queries.
-additional_response: Empowers the module to repeat queries until a condition is met, which helps overcome token limit restrictions.
-select_chunks: Enables selective data chunk comparison for better data handling based on token limits and necessity.
-token_size_adjustment: Offers the flexibility to modify chunk sizes on the fly, enhancing adaptability.
-abort: Grants the module the authority to halt the query cycle if deemed resource-inefficient.
-suggestions: Facilitates leaving constructive feedback for future iterations.
-Autonomy and Efficiency:
+### Instruction Set
+- `bot_notation`: Enables contextual annotations for data chunks between queries.
+- `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
+- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
+- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
+- `abort`: Authorizes termination of the query loop to conserve resources.
+- `suggestions`: Provides a system for leaving future improvement notes.
 
-The system is designed to give modules considerable autonomy, allowing them to handle vast quantities of data effectively. This autonomy ensures that the output is seamless and requires no additional "stitching" by the end user.
+## Autonomy & Efficiency
 
-Ease of Preparation:
+Empowers modules with significant autonomy for managing large data volumes efficiently, ensuring the output is streamlined and user post-processing is minimal.
 
-From the user's perspective, the preparation process is greatly simplified. The system is capable of chunking data effortlessly and can manage numerous prompts in a single send. For the modules, this translates to an enhanced ability to handle requests without the user's constant input, particularly for common issues related to query specifications.
+## User Convenience
 
-Conclusion:
+Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
 
-This codebase is an invaluable resource for developers looking to automate and streamline the handling of extensive data in API-driven environments. It addresses common challenges and offers innovative solutions to ensure that both user and module can operate with efficiency and precision.
+## Conclusion
 
-A distinguishing feature is its distinct data prompt handling. Typically, the AI system can consume around ~8200 tokens per instance. This cap often limits users, compelling them to manually segment their prompts, potentially undermining information precision and expectations. Contrarily, this software retains the prompt and instruction across every data query, smartly breaking the data into 'chunks' that are easy to handle.
+Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
 
-User control is paramount. Individuals can tweak these 'chunks' as they see fit, striking a balance between anticipated completion and prompt percentages. Notably, the software empowers the AI with a degree of autonomy, letting it request particular annotations to maintain context between data queries, answer multiple times for each data chunk, or even revisit earlier data chunks for enhanced data understanding.
-## Purpose
+---
 
-The abstract_ai module enhances class management for seamless interaction with the GPT model, streamlining query handling.
+Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
 
-## Motivation
+```
 
-The module aims to simplify AI application and address the token constraint challenge faced when working with GPT models.
+Here's how each section would look when formatted:
 
-## Objective
+# Dynamic Data Chunking & API Query Handler
 
-The objective of this module is to improve the ease of using AI for tasks like creating docstrings and generating READMEs by automating code segmentation and interaction.
+## Overview
+
+This repository presents a sophisticated code example engineered to efficiently process extensive datasets via an intelligent chunking algorithm, tailored for API interactions where data size and query constraints are predominant. It assures a smooth operation with minimal user input.
+
+## Key Features
+
+### Dual Input System
+- `Request` and `Prompt Data` sections for straightforward data incorporation.
+- Automatic division of prompt data into manageable chunks based on user-specified parameters.
+
+### Intelligent Chunking
+- Dynamically segments data considering the set percentage for expected completion per API query and the maximum token limit.
+- Executes iterative queries through a response handler class until data processing completes.
+
+### Iterative Query Execution
+- Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
+
+### Instruction Set
+- `bot_notation`: Enables contextual annotations for data chunks between queries.
+- `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
+- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
+- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
+- `abort`: Authorizes termination of the query loop to conserve resources.
+- `suggestions`: Provides a system for leaving future improvement notes.
+
+## Autonomy & Efficiency
+
+Empowers modules with significant autonomy for managing large data volumes efficiently, ensuring the output is streamlined and user post-processing is minimal.
+
+## User Convenience
+
+Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
+
+## Conclusion
+
+Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
+
+---
+
+Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
+
 
 ### Extended Overview
 
