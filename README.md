@@ -31,7 +31,8 @@
 
 ## Overview
 
-`api_calls.py` serves as a bridge between your application and the OpenAI GPT API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.
+Abstract AI is a feature-rich Python module for interacting with the OpenAI GPT-3 and 4 API. It provides an easy way to manage requests and responses with the AI and allows for detailed interaction with the API, giving developers control over the entire process. This module manages data chunking for large files, allowing the user to process large documents in a single query. It is highly customizable, with methods allowing modules to maintain context, repeat queries, adjust token sizes, and even terminate the query loop if necessary.
+
 
 ## Installation
 
