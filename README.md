@@ -44,8 +44,8 @@ To utilize the `api_calls.py` module, install the necessary dependencies and con
    ```
 
 2. Set your OpenAI API key as an environment variable. By default, the module searches for an environment variable named `OPENAI_API_KEY` for API call authentication. Ensure your `.env` is saved in `home/envy_all`, `documents/envy_all`, within the `source_folder`, or specify the `.env` path in the GUI settings tab.
-## GptManager Overview
 
+## Abstract Ai Overciew
 
 ```markdown
 # Dynamic Data Chunking & API Query Handler
