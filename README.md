@@ -68,10 +68,10 @@ This repository presents a sophisticated code example engineered to efficiently 
 - Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
 
 ### Instruction Set
-- `bot_notation`: Enables contextual annotations for data chunks between queries.
+- `bot_notation`: allows the module to create notes about the current data chunk to be recieved upon the next query, this is such that they can keep context, and understand why the previous selections were made.
 - `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
-- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
-- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
+- `select_chunks`: allows the module to review either the previous or next chunk of data alongside the current or by itself, if needed, the loop will essentially impliment additional_response for this.
+- `token_size_adjustment`: allows the module to adjust the size of the chunks being sent, this is a neat feature because they do get finicky about this and it can be used in combination with any of the above. 
 - `abort`: Authorizes termination of the query loop to conserve resources.
 - `suggestions`: Provides a system for leaving future improvement notes.
 
@@ -322,7 +322,7 @@ These classes work collectively to simplify the task of sending queries, interpr
 - **abstract_utilities**: Contains general-purpose utility functions and classes.
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
 
-#### GptBuilder
+#### GptManager
 
 To use the `abstract_ai_gui_backend.py`, first, initialize the GptManager class. Following this step, use the update methods to set or change configurations. Finally, use the `get_query()` method to query the GPT model and retrieve a response.
 This chunk of code contains several methods for the abstract_ai_gui_backend module of the Abstract AI system:
@@ -515,9 +515,6 @@ This module is a segment of the Abstract AI system that manages the creation and
 
 Each of these methods, with their signature features, enhances the usability and functionality of the Abstract_AI system, ensuring optimized interactions, easy navigation through data chunks, and adept handling of responses.
 
-#### PromptManager
-
-Focuses on prompts and their processing, determining token distribution and counting tokens in given text.
 #### ApiManager
 Overview
 The ApiBuilder.py is a component of the abstract_ai GPT API console that streamlines the usage of the OpenAI API. It serves as a utility module for managing API keys and constructing request headers required for API interactions.
@@ -570,9 +567,7 @@ Below is a brief description of the methods of this class:
 - It handles the communication with the AI model, sending queries and storing/interpreting responses, significantly simplifying the interaction process for the end-users.
 - It also gives the chat modules sufficient autonomy to efficiently handle the requests, preserving context and continuity in the responses. This helps avoid the need for users to stitch together the responses manually, leading to a more seamless interaction experience.
 
-
-
-# Create an ApiManager instance
+# ApiManager
 api_manager = ApiManager()
 
 # API key and headers are set up and ready to be used for requests
@@ -592,6 +587,8 @@ load_openai_key(): Loads the API key into the OpenAI library for authenticating 
 get_header(): Constructs the headers required for making API requests.
 Security
 The ApiManager leverages environment variables to manage the API key, which is a secure practice. Ensure not to expose your API key in the codebase or any version control systems.
+
+
 ### Additional Information
 
 - **Author**: putkoff
