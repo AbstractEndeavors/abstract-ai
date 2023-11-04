@@ -134,7 +134,8 @@ instruction_mgr = InstructionManager(notation=notation,
                                      abort=abort,
                                      generate_title=generate_title,
                                      additional_responses=additional_responses,
-                                     additional_instruction=additional_instruction
+                                     additional_instruction=additional_instruction,
+                                     request_chunks=self.request_chunks
                                      )
 
 instruction_mgr.instructions 
