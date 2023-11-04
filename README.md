@@ -323,10 +323,13 @@ These classes work collectively to simplify the task of sending queries, interpr
 - **abstract_utilities**: Contains general-purpose utility functions and classes.
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
 
-# GptManager
+#abstract_ai_gui_backend.py
 
+## Overview
 To use the `abstract_ai_gui_backend.py`, first, initialize the GptManager class. Following this step, use the update methods to set or change configurations. Finally, use the `get_query()` method to query the GPT model and retrieve a response.
 This chunk of code contains several methods for the abstract_ai_gui_backend module of the Abstract AI system:
+
+### Class: GptManager
 
 1. `update_response_mgr`: This method updates the ResponseManager instance used by the module, linking it with the existing instances of PromptManager and ApiManager. The ResponseManager generates AI response to prompts that are sent.
 
@@ -419,13 +422,15 @@ Below are the method descriptions:
 
 Note: In the `__init__` function, depending on the given inputs, the function prioritizes model_name over endpoint in setting the selected model, endpoint, and maximum tokens.
 
-# PromptManager
+# PromptBuilder.py
 
 PromptBuilder is a sophisticated module within the Abstract AI's ApiConsole, designed to handle the intricacies of token distribution, chunking of data, and prompt construction necessary for interfacing with language model APIs.
 
 ## Overview
 
 PromptBuilder.py specializes in calculating and managing token allocations for prompt and completion outputs, considering the user's specifications and the constraints of the API's token limits. It ensures that queries are not only well-formed but also optimally structured for the language model to understand and respond effectively. The module's responsibilities extend to sizing the current query, evaluating the total prompt data, and segmenting it into processable chunks before final prompt assembly.
+
+### PromptManager
 
 ## Key Features
 
@@ -497,10 +502,13 @@ Here's an overview of two prominent methods:
   ]
 }
 ```
-# InstructionManager
+#InstructonBuilder.py
+
+##OverView
 
 This module is a segment of the Abstract AI system that manages the creation and modifications of instructions used by the GPT-3 model. It composes a significant component of `abstract_ai_gui_backend.py`, working closely with classes like GptManager, ApiManager, ModelManager, PromptManager, and ResponseManager to ensure efficient and structured interactions with the model.
 
+### Class: InstructionManager
 - Main Methods:
 
 1. `update_response_mgr`: Links the existing instances of PromptManager and ApiManager, updating the ResponseManager used by the module.
@@ -539,8 +547,6 @@ from ApiBuilder import ApiManager
 ## Overview
 
 The Purpose of the `ResponseBuilder.py` is to handle interactions and communications with AI models primarily through API endpoints. It ensures that responses are correctly interpreted, any errors are handled gracefully, and the responses are saved in a structured manner to facilitate easy retrieval and analysis at a later stage. It’s a core part of the `abstract_ai`, module we are currently communicating through.
-
-## Detailed Description
 
 ### Class: ResponseManager
 
