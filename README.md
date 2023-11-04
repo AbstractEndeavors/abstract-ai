@@ -323,7 +323,7 @@ These classes work collectively to simplify the task of sending queries, interpr
 - **abstract_utilities**: Contains general-purpose utility functions and classes.
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
 
-## GptManager
+# GptManager
 
 To use the `abstract_ai_gui_backend.py`, first, initialize the GptManager class. Following this step, use the update methods to set or change configurations. Finally, use the `get_query()` method to query the GPT model and retrieve a response.
 This chunk of code contains several methods for the abstract_ai_gui_backend module of the Abstract AI system:
@@ -399,7 +399,7 @@ This code chunk contains four methods for managing output display in the applica
 
 This code manages the logic for traversing through the returned responses. It correctly fetches the number of responses, decides whether to go back or forward based on the event, adjusts the display accordingly and updates it. It is important to update the documentation with these details to allow the users to understand the flow of control in the script.
 
-#### ModelManager
+# ModelManager
 
 The ModelManager class, as part of the `abstract_ai` module, provides functionalities for selecting, querying, and managing information about the available GPT models. The class initializes a list of models and their related information like endpoint and token limits. It also has methods to get model-specific details like endpoints, names, and token limits.
 
@@ -419,7 +419,7 @@ Below are the method descriptions:
 
 Note: In the `__init__` function, depending on the given inputs, the function prioritizes model_name over endpoint in setting the selected model, endpoint, and maximum tokens.
 
-#### PromptManager
+# PromptManager
 
 PromptBuilder is a sophisticated module within the Abstract AI's ApiConsole, designed to handle the intricacies of token distribution, chunking of data, and prompt construction necessary for interfacing with language model APIs.
 
@@ -497,7 +497,7 @@ Here's an overview of two prominent methods:
   ]
 }
 ```
-#### InstructionManager
+# InstructionManager
 
 This module is a segment of the Abstract AI system that manages the creation and modifications of instructions used by the GPT-3 model. It composes a significant component of `abstract_ai_gui_backend.py`, working closely with classes like GptManager, ApiManager, ModelManager, PromptManager, and ResponseManager to ensure efficient and structured interactions with the model.
 
@@ -516,7 +516,7 @@ This module is a segment of the Abstract AI system that manages the creation and
 
 Each of these methods, with their signature features, enhances the usability and functionality of the Abstract_AI system, ensuring optimized interactions, easy navigation through data chunks, and adept handling of responses.
 
-#### ApiManager
+# ApiManager
 Overview
 The ApiBuilder.py is a component of the abstract_ai GPT API console that streamlines the usage of the OpenAI API. It serves as a utility module for managing API keys and constructing request headers required for API interactions.
 
@@ -534,7 +534,7 @@ python
 Copy code
 from ApiBuilder import ApiManager
 
-#### ResponseBuilder.py
+# ResponseBuilder.py
 
 ## Overview
 
