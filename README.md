@@ -13,7 +13,7 @@
   - [Motivation](#motivation)
   - [Objective](#objective)
     - [Extended Overview](#extended-overview)
-  - [Detailed Components Documentation](#main-components)
+  - [Detailed Components Documentation](#main-Detailed-Components_Documentation)
     - [GptManager](#gptmanager)
     - [ApiManager](#apimanager)
     - [ModelManager](#modelmanager)
