@@ -330,6 +330,10 @@ Empowers modules with significant autonomy for managing large data volumes effic
 
 Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
 
+### Extended Overview
+
+Instead of the user making multiple attempts to format their queries correctly and getting feedback from the AI, and subsequently manually sending multiple prompts; this module equips the system with enough autonomy to address these challenges independently, minimizing the back-and-forth interactions after the initial prompt submission. It addresses the need to automate code segmentation, provide relevant instructions, and reduce manual interaction with the AI, improving efficiency.
+
 ## Conclusion
 
 Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
@@ -337,11 +341,6 @@ Developers seeking to automate and refine data handling for API-centric applicat
 ---
 
 Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
-
-
-### Extended Overview
-
-Instead of the user making multiple attempts to format their queries correctly and getting feedback from the AI, and subsequently manually sending multiple prompts; this module equips the system with enough autonomy to address these challenges independently, minimizing the back-and-forth interactions after the initial prompt submission. It addresses the need to automate code segmentation, provide relevant instructions, and reduce manual interaction with the AI, improving efficiency.
 
 ### Main Components
 
