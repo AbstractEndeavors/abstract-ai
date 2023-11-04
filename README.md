@@ -300,19 +300,251 @@ Instead of the user making multiple attempts to format their queries correctly a
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
 
 ### Detailed Components Documentation
+The `GptManager.py` module provides an extensive class management to interact with the GPT-3 model conveniently. This module combines various functionalities into a unified and structured framework. Some of the significant classes it encapsulates are as follows:
+
+- GptManager: This is the central class that administers the interactions and data flow amongst distinct components.
+- ApiManager: This manages the OpenAI API keys and headers.
+- ModelManager: This takes care of model selection and querying.
+- PromptManager: This takes care of the generation and management of prompts. 
+- InstructionManager: This encapsulates the instructions for the GPT model.
+- ResponseManager: This administers the responses received from the model.
+
+These classes work collectively to simplify the task of sending queries, interpreting responses, and managing the interactions with the GPT-3 model. The module heavily depends on packages like `abstract_webtools`, `abstract_gui`, `abstract_utilities`, and `abstract_ai_gui_layout`.
+
+#### GptBuilder
+
+To use the `abstract_ai_gui_backend.py`, first, initialize the GptManager class. Following this step, use the update methods to set or change configurations. Finally, use the `get_query()` method to query the GPT model and retrieve a response.
+This chunk of code contains several methods for the abstract_ai_gui_backend module of the Abstract AI system:
+
+1. `update_response_mgr`: This method updates the ResponseManager instance used by the module, linking it with the existing instances of PromptManager and ApiManager. The ResponseManager generates AI response to prompts that are sent.
+
+2. `get_query`: The method is used for making respective calls to get responses. If a response is already computed, it stops the existing request (using `ThreadManager`) and starts a new thread for response retrieval.
+
+3. `update_all`: This method is used to update all the managers used by the module, to keep their data in sync.
+
+4. `get_new_api_call_name`: This method generates a new unique name for API call and appends it in the API call list.
+
+5. `get_remainder`: It returns what's left when 100 is subtracted from the value from a specific key.
+
+6. `check_test_bool`: This method checks if a test run is initiated. According to the result, it sets different statuses and updates the GUI accordingly.
+
+7. `get_new_line`: The method simply returns a newline character(s).
+
+8. `update_feedback`: This method fetches a value from the last response, based on the given key, and updates the GUI accordingly.
+
+9. `update_text_with_responses`: This method loads the last response and if it contains API response, it updates the GUI with the Title, Request text, and Response. For other feedback, it appends the information to the output.
+
+10. `get_bool_and_text_keys`: This method simply returns a list of keys formed by the given key_list and sections_list.
+
+11. `text_to_key`: The static method uses the function from utilities to generate a key name from text.
+
+12. `get_dots`: This method is used for decorating progress status.
+
+13. `update_progress_chunks`: This method provides a visual representation of the overall progress with respect to total chunks.
+
+14. `check_response_mgr_status`: This method checks whether the response manager's query process is finished by checking the `query_done` attribute.
+
+15. `submit_query`: This method controls the sending and receiving of queries and updating the GUI with the AI response.
+
+16. `update_chunk_info`: This method updates information related to the chunk based on the progress.
+
+17. `adjust_chunk_display`: This method modifies the GUI value responsible for displaying the chunk number in GUI based on the navigation number provided.
+
+The above chunk contains a sequence of function definitions that manage different parts of the AI interaction process within the abstract_ai module. Here's a concise guide about each method:
+
+- `get_chunk_display_numbers`: Retrieves the display number for the current data chunk.
+
+- `determine_chunk_display`: Determines if a data chunk should be displayed based on the input event.
+
+- `append_output`: Appends new content to a particular key in the output.
+
+- `add_to_chunk`: Appends new content to the current data chunk.
+
+- `clear_chunks`: Resets the current chunk data.
+
+- `get_url`: Retrieves the URL for a script.
+
+- `get_url_manager`: Checks if a URL manager exists for a particular URL.
+
+- `test_files`: Performs tests on the AI model with a hard-coded query.
+
+- `update_last_response_file`: Stores the path of the most recent response file, and updates the related GUI elements.
+
+- `update_response_list_box`: Updates the list box displaying response files.
+
+- `aggregate_conversations`: Aggregates all conversations from JSON files in a specified directory.
+
+- `initialize_output_display`: Initializes the display for the output and sets the data to the first item of the latest output.
+This code chunk contains four methods for managing output display in the application.
+
+1) `get_output_display_numbers`: This functions fetches from `window_mgr` the value associated with the `-RESPONSE_TEXT_NUMBER-` key and stores it in `response_text_number_display`. Additionally, it calculates `response_text_number_actual` by subtracting 1 from `response_text_number_display`.
+
+2) `determine_output_display`: This function checks the current `event` and decides whether the output display needs to be adjusted and in which direction (back or forward). It checks the conditions and, if valid, calls the `adjust_output_display` method.
+
+3) `adjust_output_display`: This function accepts one argument `num` which is used to adjust `response_text_number_actual` and `response_text_number_display`. It updates the output display and updates the `-RESPONSE_TEXT_NUMBER-` key in the `window_mgr` with the new value of `response_text_number_display`.
+
+4) `update_output`: This function accepts `output_iteration` as an argument and checks if it lies within the valid range. If valid, it assigns the designated output to `self.latest_output[output_iteration]` and then calls `update_text_with_responses`.
+
+This code manages the logic for traversing through the returned responses. It correctly fetches the number of responses, decides whether to go back or forward based on the event, adjusts the display accordingly and updates it. It is important to update the documentation with these details to allow the users to understand the flow of control in the script.
 
 #### ModelManager
 
-Manages models for the communication system. Key attributes include lists of all models, endpoints, and selected model details.
+The ModelManager class, as part of the `abstract_ai` module, provides functionalities for selecting, querying, and managing information about the available GPT models. The class initializes a list of models and their related information like endpoint and token limits. It also has methods to get model-specific details like endpoints, names, and token limits.
 
+Below are the method descriptions:
+
+- `__init__`: Initialises the ModelManager instance with information about all available models. It also sets up the default model, endpoints, and maximum tokens.
+
+- `get_all_values`: Takes a key as an input parameter and returns all unique values associated with this key in the `all_models` list.
+
+- `_get_all_values`: An alternate private method to `get_all_values` that performs the same functionality with a reduced number of lines by using a list comprehension.
+
+- `_get_endpoint_by_model`: Returns the endpoint associated with the input model name.
+
+- `_get_models_by_endpoint`: Returns a list of models associated with a given endpoint.
+
+- `_get_max_tokens_by_model`: Returns the maximum tokens that can be processed by a given model.
+
+Note: In the `__init__` function, depending on the given inputs, the function prioritizes model_name over endpoint in setting the selected model, endpoint, and maximum tokens.
+
+#### PromptManager
+
+PromptBuilder is a sophisticated module within the Abstract AI's ApiConsole, designed to handle the intricacies of token distribution, chunking of data, and prompt construction necessary for interfacing with language model APIs.
+
+## Overview
+
+PromptBuilder.py specializes in calculating and managing token allocations for prompt and completion outputs, considering the user's specifications and the constraints of the API's token limits. It ensures that queries are not only well-formed but also optimally structured for the language model to understand and respond effectively. The module's responsibilities extend to sizing the current query, evaluating the total prompt data, and segmenting it into processable chunks before final prompt assembly.
+
+## Key Features
+
+- **Token Distribution:** Allocates tokens between prompts and completions based on instruction weight, verbosity, and available token quota.
+- **Data Chunking:** Separates prompt data into manageable chunks, conforming to the calculated token budget.
+- **Prompt Construction:** Assembles the full prompt incorporating user instructions, chunk data, and module notation, ready for API interaction.
+- **Integration:** Serves as a foundational tool for the system, called upon in nearly every significant interaction with Abstract AI.
+
+## Dependencies
+
+PromptBuilder.py relies on the `nltk` and `tiktoken` libraries for accurate tokenization and text encoding, ensuring precise calculations and data handling.
+
+## Usage
+
+To utilize the PromptBuilder.py, import the module and instantiate the required class. Utilize its methods by adjusting parameters to fit the needs of your query. Here's an example using `calculate_token_distribution`:
+
+```python
+from PromptBuilder import PromptBuilder
+
+# Create an instance of the PromptBuilder class
+prompt_builder = PromptBuilder()
+
+# Example usage of calculate_token_distribution
+token_distribution = prompt_builder.calculate_token_distribution(user_query)
+```
+
+## Integration with Abstract AI
+
+PromptBuilder.py is deeply integrated with the Abstract AI suite, often collaborating with `ApiBuilder.py`, `ModelBuilder.py`, and `abstract_ai_gui_backend.py` for a cohesive and efficient API interaction experience.
+
+## Methods Overview
+
+- `get_token_calcs`: Evaluates token distribution for each chunk, ensuring balance between prompts and completions.
+- `get_token_distributions`: Distributes tokens optimally across chunks based on the prompt and completion needs.
+
+
+### Helpful Methods in PromptBuilder.py
+
+Among the functions in this module, the token calculation functions `get_token_calcs` and `get_token_distributions` are quite crucial. They carefully calculate the tokens used and available for prompts and completion. If, at any point, available prompt tokens fall below zero, they get added to the available completion tokens leading to a balance distribution.
+
+Here's an overview of two prominent methods:
+
+- `get_token_calcs`: Evaluates individual token calculations for prompt and completion data. On detecting a shortage in available tokens, it redistributes tokens from the completion pool.
+
+- `get_token_distributions`: It distributes tokens between the prompt and completion parts of the GPT-3 model query, ensuring a smooth and balanced query and keeping within the maximum token limit for the task.
+
+#api_response#
+
+```json
+{
+  "title": "Chunking Strategies in PromptBuilder.py",
+  "prompt_type": "Python Code",
+  "prompt": "The code snippet is a part of `PromptBuilder.py` from the `abstract_ai` module. This specific part shows the crucial role of chunking strategies in the functioning of `abstract_ai`.\n\nThe `chunk_data_by_type` function takes in data, a maximum token limit, and a type of chunk (with possible values like 'URL', 'SOUP', 'DOCUMENT', 'CODE', 'TEXT'). Depending on the specified type, it applies different strategies to split the data into chunks. If a chunk type is not detected, the data is split based on line breaks.\n\nThe function `chunk_text_by_tokens` is specifically used when the chunk type is 'TEXT'. It chunks the input data based on the specified maximum tokens, ensuring each chunk does not exceed this limit.\n\nWith the `chunk_source_code` function, you can chunk source code based on individual functions and classes. This is crucial to maintain the context and readability within a code snippet.\n\n`extract_functions_and_classes` is a helper function used within `chunk_source_code`, it extracts all the functions and classes from the given source code. The extracted functions and classes are then used to chunk source code accordingly.\n\nThese functions are called numerous times in the abstract_ai platform, emphasizing their key role in the system.",
+  "suggested_formatting": [
+    {
+      "code": {
+        "language": "python",
+        "content": [
+          "def chunk_data_by_type(data, max_tokens, chunk_type=None):",
+          "...",
+          "def chunk_text_by_tokens(prompt_data, max_tokens):",
+          "...",
+          "def extract_functions_and_classes(source_code):",
+          "...",
+          "def chunk_source_code(source_code, max_tokens):"
+        ]
+      }
+    }
+  ]
+}
+```
 #### InstructionManager
 
-Controls instructions for ChatGPT. Among its methods, it can interpret 'additional_responses' and determine the 'generate_title' value.
+This module is a segment of the Abstract AI system that manages the creation and modifications of instructions used by the GPT-3 model. It composes a significant component of `abstract_ai_gui_backend.py`, working closely with classes like GptManager, ApiManager, ModelManager, PromptManager, and ResponseManager to ensure efficient and structured interactions with the model.
+
+- Main Methods:
+
+1. `update_response_mgr`: Links the existing instances of PromptManager and ApiManager, updating the ResponseManager used by the module.
+2. `get_query`: Controls interrupting ongoing requests and starting a new thread for response retrieval through the `ThreadManager`.
+3. `update_all`: Keeps the model, API, and other managers up to date and synchronized.
+4. `get_new_api_call_name`: Generates unique ID for each API call and maintains them in a list.
+5. `get_remainder`: Works on value subtraction for a particular key.
+6. `get_new_line`: A simple method for returning newline characters.
+7. `update_feedback`: Fetches a key-value pair from the prior response and updates the GUI.
+8. `update_text_with_responses`: Loads the latest response, extracts necessary information, and updates the GUI accordingly.
+9. `update_chunk_info`: Manages updates relating to the chunk based on the progression of the query.
+10. `adjust_chunk_display`: Alters the GUI value responsible for showing the chunk number based on the provided navigation number.
+
+Each of these methods, with their signature features, enhances the usability and functionality of the Abstract_AI system, ensuring optimized interactions, easy navigation through data chunks, and adept handling of responses.
 
 #### PromptManager
 
 Focuses on prompts and their processing, determining token distribution and counting tokens in given text.
+#### ApiManager
+Overview
+The ApiBuilder.py is a component of the abstract_ai GPT API console that streamlines the usage of the OpenAI API. It serves as a utility module for managing API keys and constructing request headers required for API interactions.
 
+Features
+API Key Retrieval: Securely fetches the OpenAI API key from environmental storage, ensuring that sensitive data is not hardcoded into the application.
+Header Construction: Automates the creation of the necessary authorization headers for making requests to the OpenAI API.
+Prerequisites
+To use ApiBuilder.py, ensure that you have an OpenAI API key stored in your environment variables under the name OPENAI_API_KEY.
+
+Getting Started
+To begin with ApiBuilder.py, you can create an instance of ApiManager and then use it to perform operations requiring API access. The ApiManager class encapsulates all you need to manage API keys and headers for the OpenAI GPT API requests.
+
+Usage
+python
+Copy code
+from ApiBuilder import ApiManager
+
+# Create an ApiManager instance
+api_manager = ApiManager()
+
+# API key and headers are set up and ready to be used for requests
+print(api_manager.api_key)          # Displays the loaded API key
+print(api_manager.header)           # Displays the generated headers
+Class ApiManager
+ApiManager is responsible for handling API keys and headers. It comes with a default configuration but can be customized during instantiation.
+
+Attributes:
+content_type (str): The MIME type of the request content. Defaults to 'application/json'.
+api_env (str): The environment variable name where the API key is stored. Defaults to 'OPENAI_API_KEY'.
+api_key (str): The actual API key used for authentication with the OpenAI API.
+header (dict): The authorization headers used in API requests.
+Methods:
+get_openai_key(): Retrieves the API key from the environment variable.
+load_openai_key(): Loads the API key into the OpenAI library for authenticating requests.
+get_header(): Constructs the headers required for making API requests.
+Security
+The ApiManager leverages environment variables to manage the API key, which is a secure practice. Ensure not to expose your API key in the codebase or any version control systems.
 ### Additional Information
 
 - **Author**: putkoff
