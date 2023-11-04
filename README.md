@@ -287,15 +287,6 @@ Developers seeking to automate and refine data handling for API-centric applicat
 Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
 
 ```
-
-Here's how each section would look when formatted:
-
-# Dynamic Data Chunking & API Query Handler
-
-## Overview
-
-This repository presents a sophisticated code example engineered to efficiently process extensive datasets via an intelligent chunking algorithm, tailored for API interactions where data size and query constraints are predominant. It assures a smooth operation with minimal user input.
-
 ## Key Features
 
 ### Dual Input System
