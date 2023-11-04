@@ -13,7 +13,7 @@
   - [Motivation](#motivation)
   - [Objective](#objective)
     - [Extended Overview](#extended-overview)
-  - [Main Components](#main-components)
+  - [Detailed Components Documentation](#main-components)
     - [GptManager](#gptmanager)
     - [ApiManager](#apimanager)
     - [ModelManager](#modelmanager)
@@ -303,21 +303,6 @@ Your request to review the provided example was processed successfully. The enti
 
 *File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
 
-### Main Components
-
-- **GptManager**: The core, orchestrating interactions and flow among components.
-- **ApiManager**: Manages OpenAI API keys and headers.
-- **ModelManager**: Handles model selection and querying.
-- **PromptManager**: Responsible for generating and managing prompts.
-- **InstructionManager**: Dictates instructions for the GPT model.
-- **ResponseManager**: Processes model responses.
-
-### Dependencies
-
-- **abstract_webtools**: Provides web-centric tools.
-- **abstract_gui**: Houses GUI-related tools and components.
-- **abstract_utilities**: Contains general-purpose utility functions and classes.
-- **abstract_ai_gui_layout**: Lays out the AI GUI.
 ### Detailed Components Documentation
 The `GptManager.py` module provides an extensive class management to interact with the GPT-3 model conveniently. This module combines various functionalities into a unified and structured framework. Some of the significant classes it encapsulates are as follows:
 
@@ -329,6 +314,13 @@ The `GptManager.py` module provides an extensive class management to interact wi
 - ResponseManager: This administers the responses received from the model.
 
 These classes work collectively to simplify the task of sending queries, interpreting responses, and managing the interactions with the GPT-3 model. The module heavily depends on packages like `abstract_webtools`, `abstract_gui`, `abstract_utilities`, and `abstract_ai_gui_layout`.
+
+### Dependencies
+
+- **abstract_webtools**: Provides web-centric tools.
+- **abstract_gui**: Houses GUI-related tools and components.
+- **abstract_utilities**: Contains general-purpose utility functions and classes.
+- **abstract_ai_gui_layout**: Lays out the AI GUI.
 
 #### GptBuilder
 
