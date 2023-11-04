@@ -33,24 +33,6 @@
 
 `api_calls.py` serves as a bridge between your application and the OpenAI GPT API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.
 
-## Images
-
-![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
-
-*URL grabber component: Allows users to add URL source code or specific portions of the URL source code to the prompt data.*
-
-![Settings Tab](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/settings_tab.png)
-
-*Settings Tab: Contains all selectable settings, including available, desired, and used prompt and completion tokens.*
-
-![Instructions Display](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/instructions_display.png)
-
-*Instructions Display: Showcases all default instructions, which are customizable in the same pane. All instructions are derived from the `instruction_manager` class.*
-
-![File Content Chunks](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/file_content_chunks.png)
-
-*File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
-
 ## Installation
 
 To utilize the `api_calls.py` module, install the necessary dependencies and configure your OpenAI API key:
@@ -298,6 +280,23 @@ Instead of the user making multiple attempts to format their queries correctly a
 - **abstract_gui**: Houses GUI-related tools and components.
 - **abstract_utilities**: Contains general-purpose utility functions and classes.
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
+## Images
+
+![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
+
+*URL grabber component: Allows users to add URL source code or specific portions of the URL source code to the prompt data.*
+
+![Settings Tab](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/settings_tab.png)
+
+*Settings Tab: Contains all selectable settings, including available, desired, and used prompt and completion tokens.*
+
+![Instructions Display](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/instructions_display.png)
+
+*Instructions Display: Showcases all default instructions, which are customizable in the same pane. All instructions are derived from the `instruction_manager` class.*
+
+![File Content Chunks](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/file_content_chunks.png)
+
+*File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
 
 ### Detailed Components Documentation
 The `GptManager.py` module provides an extensive class management to interact with the GPT-3 model conveniently. This module combines various functionalities into a unified and structured framework. Some of the significant classes it encapsulates are as follows:
@@ -524,6 +523,42 @@ Usage
 python
 Copy code
 from ApiBuilder import ApiManager
+
+#### ResponseBuilder.py
+
+## Overview
+
+The Purpose of the `ResponseBuilder.py` is to handle interactions and communications with AI models primarily through API endpoints. It ensures that responses are correctly interpreted, any errors are handled gracefully, and the responses are saved in a structured manner to facilitate easy retrieval and analysis at a later stage. It’s a core part of the `abstract_ai`, module we are currently communicating through.
+
+## Detailed Description
+
+### Class: ResponseManager
+
+The `ResponseManager` class is a single handler of all in-query events and module interactions. It leverages various utilities from the `abstract_utilities` module to process and organise the data, interacting closely with the `SaveManager` to persist responses.
+
+This class can be initialised with an instance of `prompt manager`' and `API manager`, optional `title` for the session or the file saved, and `directory` path where responses are to be saved.
+
+Below is a brief description of the methods of this class:
+
+- `re_initialize_query`: Resets query-related attributes to their default state for a new query cycle.
+- `post_request`: Sends a POST request with the current prompt and headers to the AI model and handles the response.
+- `get_response`: Extracts and formats the response from the API call.
+- `try_load_response`: Attempts to load the response content into a structured format.
+- `extract_response`: Processes the response and manages the creation of a save point through `SaveManager`.
+- `get_last_response`: Retrieves the last response from the save location.
+- `get_response_bools`: Checks and sets boolean flags based on the content of the latest response.
+- `send_query`: Prepares and sends a new query to the AI model, then processes the response.
+- `test_query`: Simulates sending a query for testing purposes.
+- `prepare_response`: Handles the response after a query has been sent.
+- `initial_query`: Manages the initial sequence of sending queries and processing responses.
+
+## Benefits and Features
+
+- The `ResponseBuilder` automatically chunks large data sets into manageable segments based on the percentage delegated for expected completion per query relative to the max tokens limit. This prevents wasting compute cycles on unnecessarily large queries and helps ensure more efficient responses. 
+- It handles the communication with the AI model, sending queries and storing/interpreting responses, significantly simplifying the interaction process for the end-users.
+- It also gives the chat modules sufficient autonomy to efficiently handle the requests, preserving context and continuity in the responses. This helps avoid the need for users to stitch together the responses manually, leading to a more seamless interaction experience.
+
+
 
 # Create an ApiManager instance
 api_manager = ApiManager()
