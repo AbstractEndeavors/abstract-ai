@@ -44,7 +44,54 @@ To utilize the `api_calls.py` module, install the necessary dependencies and con
    ```
 
 2. Set your OpenAI API key as an environment variable. By default, the module searches for an environment variable named `OPENAI_API_KEY` for API call authentication. Ensure your `.env` is saved in `home/envy_all`, `documents/envy_all`, within the `source_folder`, or specify the `.env` path in the GUI settings tab.
+## GptManager Overview
 
+
+```markdown
+# Dynamic Data Chunking & API Query Handler
+
+## Overview
+
+This repository presents a sophisticated code example engineered to efficiently process extensive datasets via an intelligent chunking algorithm, tailored for API interactions where data size and query constraints are predominant. It assures a smooth operation with minimal user input.
+
+## Key Features
+
+### Dual Input System
+- `Request` and `Prompt Data` sections for straightforward data incorporation.
+- Automatic division of prompt data into manageable chunks based on user-specified parameters.
+
+### Intelligent Chunking
+- Dynamically segments data considering the set percentage for expected completion per API query and the maximum token limit.
+- Executes iterative queries through a response handler class until data processing completes.
+
+### Iterative Query Execution
+- Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
+
+### Instruction Set
+- `bot_notation`: Enables contextual annotations for data chunks between queries.
+- `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
+- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
+- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
+- `abort`: Authorizes termination of the query loop to conserve resources.
+- `suggestions`: Provides a system for leaving future improvement notes.
+
+## Autonomy & Efficiency
+
+Empowers modules with significant autonomy for managing large data volumes efficiently, ensuring the output is streamlined and user post-processing is minimal.
+
+## User Convenience
+
+Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
+
+## Conclusion
+
+Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
+
+---
+
+Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
+
+```
 ## Usage
 
 ```python
@@ -238,111 +285,6 @@ Your request to review the provided example was processed successfully. The enti
 "false"
 ```
 
-
-## GptManager Overview
-
-
-```markdown
-# Dynamic Data Chunking & API Query Handler
-
-## Overview
-
-This repository presents a sophisticated code example engineered to efficiently process extensive datasets via an intelligent chunking algorithm, tailored for API interactions where data size and query constraints are predominant. It assures a smooth operation with minimal user input.
-
-## Key Features
-
-### Dual Input System
-- `Request` and `Prompt Data` sections for straightforward data incorporation.
-- Automatic division of prompt data into manageable chunks based on user-specified parameters.
-
-### Intelligent Chunking
-- Dynamically segments data considering the set percentage for expected completion per API query and the maximum token limit.
-- Executes iterative queries through a response handler class until data processing completes.
-
-### Iterative Query Execution
-- Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
-
-### Instruction Set
-- `bot_notation`: Enables contextual annotations for data chunks between queries.
-- `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
-- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
-- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
-- `abort`: Authorizes termination of the query loop to conserve resources.
-- `suggestions`: Provides a system for leaving future improvement notes.
-
-## Autonomy & Efficiency
-
-Empowers modules with significant autonomy for managing large data volumes efficiently, ensuring the output is streamlined and user post-processing is minimal.
-
-## User Convenience
-
-Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
-
-## Conclusion
-
-Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
-
----
-
-Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
-
-```
-## Key Features
-
-### Dual Input System
-- `Request` and `Prompt Data` sections for straightforward data incorporation.
-- Automatic division of prompt data into manageable chunks based on user-specified parameters.
-
-### Intelligent Chunking
-- Dynamically segments data considering the set percentage for expected completion per API query and the maximum token limit.
-- Executes iterative queries through a response handler class until data processing completes.
-
-### Iterative Query Execution
-- Handles documents split into multiple chunks (e.g., 14 chunks result in at least 14 API queries), with real-time adaptive query decisions.
-
-### Instruction Set
-- `bot_notation`: Enables contextual annotations for data chunks between queries.
-- `additional_response`: Allows repeated query execution until a specified condition is met, bypassing token limitations.
-- `select_chunks`: Facilitates review and comparison of data chunks as necessary.
-- `token_size_adjustment`: Permits real-time adjustment of data chunk sizes.
-- `abort`: Authorizes termination of the query loop to conserve resources.
-- `suggestions`: Provides a system for leaving future improvement notes.
-
-## Autonomy & Efficiency
-
-Empowers modules with significant autonomy for managing large data volumes efficiently, ensuring the output is streamlined and user post-processing is minimal.
-
-## User Convenience
-
-Simplifies user involvement by automating data chunking and handling multiple prompts in a single operation. The modules are also equipped to independently address typical query-related issues.
-
-### Extended Overview
-
-Instead of the user making multiple attempts to format their queries correctly and getting feedback from the AI, and subsequently manually sending multiple prompts; this module equips the system with enough autonomy to address these challenges independently, minimizing the back-and-forth interactions after the initial prompt submission. It addresses the need to automate code segmentation, provide relevant instructions, and reduce manual interaction with the AI, improving efficiency.
-
-## Conclusion
-
-Developers seeking to automate and refine data handling for API-centric applications will find this repository a valuable asset. It's crafted to mitigate common data processing challenges and implement proactive solutions for enhanced user and module performance.
-
----
-
-Your journey towards seamless data handling starts here! Dive into the code, and feel free to contribute or suggest improvements.
-
-### Main Components
-
-- **GptManager**: The core, orchestrating interactions and flow among components.
-- **ApiManager**: Manages OpenAI API keys and headers.
-- **ModelManager**: Handles model selection and querying.
-- **PromptManager**: Responsible for generating and managing prompts.
-- **InstructionManager**: Dictates instructions for the GPT model.
-- **ResponseManager**: Processes model responses.
-
-### Dependencies
-
-- **abstract_webtools**: Provides web-centric tools.
-- **abstract_gui**: Houses GUI-related tools and components.
-- **abstract_utilities**: Contains general-purpose utility functions and classes.
-- **abstract_ai_gui_layout**: Lays out the AI GUI.
 ## Images
 
 ![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
@@ -361,6 +303,21 @@ Your journey towards seamless data handling starts here! Dive into the code, and
 
 *File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
 
+### Main Components
+
+- **GptManager**: The core, orchestrating interactions and flow among components.
+- **ApiManager**: Manages OpenAI API keys and headers.
+- **ModelManager**: Handles model selection and querying.
+- **PromptManager**: Responsible for generating and managing prompts.
+- **InstructionManager**: Dictates instructions for the GPT model.
+- **ResponseManager**: Processes model responses.
+
+### Dependencies
+
+- **abstract_webtools**: Provides web-centric tools.
+- **abstract_gui**: Houses GUI-related tools and components.
+- **abstract_utilities**: Contains general-purpose utility functions and classes.
+- **abstract_ai_gui_layout**: Lays out the AI GUI.
 ### Detailed Components Documentation
 The `GptManager.py` module provides an extensive class management to interact with the GPT-3 model conveniently. This module combines various functionalities into a unified and structured framework. Some of the significant classes it encapsulates are as follows:
 
