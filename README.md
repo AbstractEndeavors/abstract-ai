@@ -323,7 +323,7 @@ These classes work collectively to simplify the task of sending queries, interpr
 - **abstract_utilities**: Contains general-purpose utility functions and classes.
 - **abstract_ai_gui_layout**: Lays out the AI GUI.
 
-#### GptManager
+## GptManager
 
 To use the `abstract_ai_gui_backend.py`, first, initialize the GptManager class. Following this step, use the update methods to set or change configurations. Finally, use the `get_query()` method to query the GPT model and retrieve a response.
 This chunk of code contains several methods for the abstract_ai_gui_backend module of the Abstract AI system:
