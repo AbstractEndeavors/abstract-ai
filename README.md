@@ -29,10 +29,9 @@
 - [Contact](#contact)
 - [License](#license)
 
-## Overview
+# `abstract_ai` Module
 
-Abstract AI is a feature-rich Python module for interacting with the OpenAI GPT-3 and 4 API. It provides an easy way to manage requests and responses with the AI and allows for detailed interaction with the API, giving developers control over the entire process. This module manages data chunking for large files, allowing the user to process large documents in a single query. It is highly customizable, with methods allowing modules to maintain context, repeat queries, adjust token sizes, and even terminate the query loop if necessary.
-
+`abstract_ai` is a  feature-rich Python module for interacting with the OpenAI GPT-3 and 4 API. It provides an easy way to manage requests and responses with the AI and allows for detailed interaction with the API, giving developers control over the entire process. This module manages data chunking for large files, allowing the user to process large documents in a single query. It is highly customizable, with methods allowing modules to maintain context, repeat queries, adjust token sizes, and even terminate the query loop if necessary.
 
 ## Installation
 
@@ -239,13 +238,9 @@ Your request to review the provided example was processed successfully. The enti
 "false"
 ```
 
-# `abstract_ai` Module
-
-The `abstract_ai` module is an advanced class management system crafted to seamlessly interact with the GPT model. Incorporating a myriad of sub-modules and components, it refines the process of querying, interpreting, and managing GPT model responses.
 
 ## GptManager Overview
 
-Absolutely, a well-formatted README file can greatly improve the appeal and readability of your GitHub repository. Here's how you might format your project description using Markdown for an aesthetically pleasing GitHub README:
 
 ```markdown
 # Dynamic Data Chunking & API Query Handler
