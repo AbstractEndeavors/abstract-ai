@@ -1,7 +1,7 @@
 import os
 import requests
+import json
 from abstract_utilities import (get_date,
-                                get_time_stamp,
                                 mkdirs,
                                 get_files,
                                 unified_json_loader,
@@ -9,23 +9,41 @@ from abstract_utilities import (get_date,
                                 safe_read_from_json,
                                 get_file_create_time,
                                 get_highest_value_obj,
-                                )
-from abstract_utilities.json_utils import get_any_value,safe_json_loads,safe_dump_to_file
+                                get_any_value,
+                                safe_json_loads,
+                                safe_dump_to_file,
+                                read_from_file,
+                                write_to_file)
 class SaveManager:
     """
     Manages the saving of data. This class should provide methods to specify where (e.g., what database or file) and how (e.g., in what format) data should be saved.
     """
-    def __init__(self, data,title=None,directory=None,model='default'):
-        self.data = safe_json_loads(data)
+    def __init__(self, data={},title=None,directory=None,model='default'):
+        self.title=title
         self.model=model
         self.date = get_date()
-        self.directory = mkdirs(directory or os.path.join(os.getcwd(), 'response_data'))
-        self.directory = mkdirs(os.path.join(self.directory, self.date))
-        self.directory = mkdirs(os.path.join(self.directory), self.model)
+        if isinstance(directory,list):
+            abs_path = directory[0]
+            if not os.path.isabs(directory[0]):
+                abs_path = os.path.join(os.getcwd(), directory[0])
+                mkdirs(abs_path)
+            path = abs_path
+            for child in directory[1:]:
+                path = os.path.join(path, child)
+                mkdirs(path)
+            self.directory=path
+        else:
+            self.directory = mkdirs(directory or os.path.join(os.getcwd(), 'response_data'))
+            self.directory = mkdirs(os.path.join(self.directory, self.date))
+            self.directory = mkdirs(os.path.join(self.directory, self.model))
         self.file_name = self.create_unique_file_name()
         self.file_path = os.path.join(self.directory, self.file_name)
-        self.save_data_to_file()
-
+        if data:
+            self.data = safe_json_loads(data)
+            self.data['file_path']=self.file_path
+            self.data['title']=self.title
+            self.data['model']=self.model
+            self.save_to_file(data = data,file_path = self.file_path)
     def create_unique_file_name(self):
         base_name = f"{self.title}.json"
         index = 1
@@ -34,25 +52,15 @@ class SaveManager:
             unique_name = f"{self.title}_{index}.json"
             index += 1
         return unique_name
-    def determine_folder(self):
-        unlist_it(self,['directory','date','model'])
-        if get_any_value(self.content,'error'):
-            self.error=True
-            self.fold_model= mkdirs(os.path.join(self.directory,self.date,'error'))
-        else:
-            self.fold_model= mkdirs(os.path.join(self.directory,self.date,self.model))
-    def create_unique_name(self):
-        self.title = self.create_unique_title(title=self.original_title,directory=self.fold_model)
-        self.query_js["title"]=self.title
-        self.file_name = f'{self.title}.json'
-    def save_file(self):
-        self.file_path = os.path.join(self.fold_model,self.file_name)
-        self.query_js["file_path"]=self.file_path
-        safe_dump_to_file(file_path=self.file_path,data=str(self.query_js))
-    def save_data_to_file(self):
-        with open(self.file_path, 'w') as file:
-            file.write(self.data)
-
+    def save_to_file(self, data, file_path):
+        # Assuming `data` is already a dictionary, we convert it to a JSON string and save.
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+    
+    @staticmethod
+    def read_saved_json(file_path):
+        # Use 'safe_read_from_json' which is presumed to handle errors and return JSON
+        return safe_read_from_json(file_path)
 class ResponseManager:
     """
     The `ResponseManager` class handles the communication process with AI models by managing the sending of queries and storage of responses. It ensures that responses are correctly interpreted, errors are managed, and that responses are saved in a structured way, facilitating easy retrieval and analysis.
@@ -89,32 +97,33 @@ class ResponseManager:
         initial_query: Manages the initial sequence of sending queries and processing responses.
 
     """
-
-    def __init__(self,prompt_mgr,api_mgr,title=None,directory=None):
+    def __init__(self,prompt_mgr=None,api_mgr=None,title=None,directory=None):
         self.prompt_mgr=prompt_mgr
         self.model_mgr=self.prompt_mgr.model_mgr
         self.api_mgr=api_mgr
         self.title=title
+        self.save_manager = SaveManager()
         self.directory=mkdirs(directory or os.path.join(os.getcwd(),'response_data'))
-        self.token_dist=prompt_mgr.token_dist
+        self.chunk_token_distributions=prompt_mgr.chunk_token_distributions
         self.output=[]
         self.content={}
         self.query_js={}
         self.bool_test=False
         self.chunk_descriptions=[]
-        self.i_query=0
         self.original_title=self.title
-        self.query_done=False
         self.re_initialize_query()
+        self.response_keys = ["api_response","abort","additional_responses","suggestions","notation","generate_title","request_chunks","token_adjustment","prompt_as_previous","created","model","error",'content']
     def re_initialize_query(self):
+        self.i_query=0
+        self.generate_title=None
         self.query_done=False
-        self.i_query = 0
         self.abort_js = {"abort":None,"additional_responses":None,"request_chunks":None}
-        self.response_keys = ["abort","additional_responses","suggestions","notation","generate_title","request_chunks","api_response","token_adjustment","prompt_as_previous"]
-        self.original_title=None
         self.suggestions=False
         self.notation=False
         self.api_response={}
+        self.request_chunks=None
+        self.token_adjustment=None
+        self.prompt_as_previous_clone=None
     def post_request(self):
         """
         Sends a POST request to the specified endpoint with the provided prompt and headers.
@@ -136,17 +145,19 @@ class ResponseManager:
             raise Exception(f'Request failed with status code {self.api_response.status_code}\n{self.api_response.text}\n\n')
         return self.get_response()
     def get_response(self):
-        """
-        Extracts and returns the response dictionary from the API response.
-
-        Returns:
-            dict: Extracted response dictionary.
-        """
+        # Convert the response to JSON directly within this method
         try:
             self.api_response = self.response.json()
-        except:
-            self.api_response = self.response.text
-        return self.api_response
+        except ValueError:
+            # Handle the case where the response is not JSON
+            self.api_response = {"error": "Response is not in JSON format", "data": self.response.text}
+        # Save the response using SaveManager
+        json_api_response = safe_json_loads(self.api_response)
+        self.save_manager = SaveManager(data=self.query_js, title=json_api_response.get('created','response'), directory=['response_data','raw_response'], model=json_api_response.get('model','default'))
+        self.get_all_instruction(json_api_response)
+        self.query_js["response"]=json_api_response
+        self.save_manager = SaveManager(data=self.query_js, title=self.generate_title or self.title or 'response', directory=self.directory, model=self.model)
+        self.output.append(self.save_manager.data)
     def try_load_response(self):
         """
         Attempts to load the response content into a structured format.
@@ -157,56 +168,49 @@ class ResponseManager:
         Processes the response and manages the creation of a save point through `SaveManager`.
         """
         return self.query_js
-    def get_last_response(self):
-        """
-        Retrieves the last response from the save location.
-
-        Returns:
-            tuple: A tuple containing the file path and the response dictionary.
-        """
-        self.recent_file = get_highest_value_obj(get_files(self.directory),function=get_file_create_time)
-        self.last_response = safe_json_loads(safe_read_from_json(self.recent_file))
-        self.content = safe_json_loads(get_any_value(self.api_response,'content'))
-        self.response_js= safe_json_loads(get_any_value(self.content, 'api_response'))
-        return self.recent_file,self.response_js
-    def get_abort():
-       self.abort_js = {"abort":None,"additional_responses":None,"request_chunks":None}
-       for key,value in self.prompt_mgr.instructions_js.items():
-           if key in list(self.abort_js.keys()):
-              setattr(self,key,value)
-              self.abort_js[key]=value
-           if self.abort_js["abort"]:
-               return True
+    def get_abort(self):
+       if self.abort_js["abort"] or self.abort_js["blank_prompt"]:
+            return True
        if self.abort_js["request_chunks"] or self.abort_js["additional_responses"]:
            return False
        else:
            return True
+    def get_all_instruction(self,data):
+        self.prompt_as_previous_clone
+        if data:
+            self.abort_js = {"abort":None,"additional_responses":None,"request_chunks":None,"blank_prompt":self.prompt.get('blank_prompt')}
+            for i,key in enumerate(self.response_keys):
+                value = get_any_value(data,key)
+                self.abort_js[key]=value
+                if isinstance(value,list) and value:
+                    value=value[-1]
+                setattr(self,key,value)
+                if key == 'prompt_as_previous' and value:
+                    self.prompt_as_previous_clone=self.api_response
+            error_response = get_any_value(data,'error')
+            if error_response:
+                self.error = 'error'
+            self.model = self.model or self.error or 'default'
+            self.title = self.generate_title or self.original_title or self.created
+            self.get_abort()
     def send_query(self):
         """
         Handles the response after a query has been sent.
         """
-        self.prompt = self.prompt_mgr.create_prompt(dist_number=self.i_query, bot_notation=self.notation,generate_title=self.generate_title,request_chunks=self.request_chunks,token_adjustment=self.token_adjustment,prompt_as_previous=self.prompt_as_previous)
-        self.endpoint = self.model_mgr.selected_endpoint
-        self.header = self.api_mgr.header
-        self.response = requests.post(url=self.endpoint, json=self.prompt, headers=self.header)
-        self.try_load_response()
-        self.api_response = safe_json_loads(get_reg_response())
         self.query_js={}
-        self.content = get_any_value(self.api_response,'content')
-        if self.content and isinstance(self.content,list):
-            if len(self.content)>0:
-                self.content = safe_json_loads(self.content[0])
-        self.content["request_chunks"]=True
-        self.query_js["prompt"]=safe_json_loads(self.prompt)
-        self.query_js["response"] = safe_json_loads(self.api_response)
-        self.query_js["query_response"]=self.content
-        self.model= get_any_value(self.query_js["response"],'model') or get_any_value(self.query_js["response"],'error') or 'default' 
-        self.title = self.original_title or  self.get_any_value(self.content,'generate_title') or get_any_value(self.query_js["response"],'created')
-        self.save_manager = SaveManager(data=self.query_js,title=self.title,directory=self.directory,model=self.model)
-        self.query_js['file_path']=save_manager.file_path
-        self.output.append(self.query_js)
-        for i,key in enumerate(self.response_keys):
-            setattr(self,key,get_any_value(self.content,key))
+        self.prompt = self.prompt_mgr.create_prompt(chunk_token_distribution_number=self.chunk_token_distribution_number,
+                                                    chunk_number = self.chunk_number,
+                                                    notation=self.notation,
+                                                    generate_title=self.generate_title,
+                                                    request_chunks=self.request_chunks,
+                                                    token_adjustment=self.token_adjustment,
+                                                    prompt_as_previous=self.prompt_as_previous_clone)
+        if self.prompt.get('blank_prompt')==None:
+            self.query_js["prompt"]=safe_json_loads(self.prompt)
+            self.endpoint = self.model_mgr.selected_endpoint
+            self.header = self.api_mgr.header
+            self.response = requests.post(url=self.endpoint, json=self.prompt, headers=self.header)
+            safe_json_loads(self.get_response())
     def initial_query(self):
         """
         Manages the initial sequence of sending queries and processing responses.
@@ -216,18 +220,25 @@ class ResponseManager:
         """
         self.query_done=False
         self.i_query = 0
-        for i in range(len(self.token_dist)):
-            response_loop=True
-            abort_it=False
-            while response_loop:
-                self.send_query()
-                if self.get_abort() or self.abort_js["abort"]:
-                    response_loop=False
+        self.total_dists = 0
+        for dist in self.chunk_token_distributions:
+            self.total_dists +=len(dist)
+        for chunk_token_distribution_number,distributions in enumerate(self.chunk_token_distributions):
+            for chunk_number,distribution in enumerate(distributions):
+                self.chunk_token_distribution_number=chunk_token_distribution_number
+                self.chunk_number=chunk_number
+                self.total_current_dist = len(distributions)
+                response_loop=True
+                abort_it=False
+                while response_loop:
+                    self.send_query()
+                    if self.get_abort() or self.abort_js["abort"]:
+                        response_loop=False
+                        break
+                print(f'in while {self.i_query}')
+                if self.abort_js["abort"]:
                     break
-            print(f'in while {i}')
-            if self.abort_js["abort"]:
-                break
-            self.i_query=i
+                self.i_query+=1
         self.query_done=True
         self.i_query=0
         return self.output
