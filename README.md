@@ -288,21 +288,22 @@ Your request to review the provided example was processed successfully. The enti
 
 ## Images
 
-![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/url_grabber_bs4_component.png)
+![URL Grabber Component](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/web_scraping_utility.png)
 
-*URL grabber component: Allows users to add URL source code or specific portions of the URL source code to the prompt data.*
+*URL grabber component: Allows users to add URL source code or specific portions of the URL source code to the prompt data, this feature is imported from the `UrlGrabber` component of the `Abstract_webtools` module.*
 
-![Settings Tab](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/settings_tab.png)
+![Settings Tab](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/query_and_response.png)
+*Prompt Data: The left pane showcases the prompt data. All PromptData are derived from the `PromptManager` class.*
+*Response: The right pane contains the response intake. All Responses are derived from the `ResponseManager` class.*
 
-*Settings Tab: Contains all selectable settings, including available, desired, and used prompt and completion tokens.*
+![Instructions Display](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/instruction_implimentation.png)
 
-![Instructions Display](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/instructions_display.png)
+*Instructions Display: Showcases all default instructions, which are customizable in the same pane. All instructions are derived from the `InstructionManager` class.*
+*Settings Tab: Contains all selectable settings, including available, desired, and used prompt and completion tokens, most of which is derived from the `PromptManmager` class.*
 
-*Instructions Display: Showcases all default instructions, which are customizable in the same pane. All instructions are derived from the `instruction_manager` class.*
+![File Content Chunks](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/prompt_data_chunking.png)
 
-![File Content Chunks](https://raw.githubusercontent.com/AbstractEndeavors/abstract-ai/main/src/abstract_ai/documentation/images/file_content_chunks.png)
-
-*File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data.*
+*File Browser Component: Enables users to add the contents of files or specific portions of file content to the prompt data, this feature is imported from the `AbstractBrowser` component of the `Abstract_gui` module.*
 
 ### Detailed Components Documentation
 The `GptManager.py` module provides an extensive class management to interact with the GPT-3 model conveniently. This module combines various functionalities into a unified and structured framework. Some of the significant classes it encapsulates are as follows:
