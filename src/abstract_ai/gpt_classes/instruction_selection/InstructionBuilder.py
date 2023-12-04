@@ -1,34 +1,58 @@
 from abstract_utilities import get_actual_number
 from abstract_utilities.type_utils import is_bool
+
 class InstructionManager:
-    def __init__(self):
-        self.default_instructions = {"api_response": {"instruction": "place response to prompt here", "example": ""},
-                                "additional_responses": {"instruction": "This parameter, usually set to True when the answer cannot be fully covered within the current token limit, initiates a loop that continues to send the current chunks prompt until the module returns a False value. This option also enables a module to have access to previous notations", "example": "False"},
-                                "generate_title": {"instruction": "A parameter used for title generation of the chat. To maintain continuity, the generated title for a given sequence is shared with subsequent queries.", "example": ""},
-                                "notation": {"instruction": "A useful parameter that allows a module to retain context and continuity of the prompts. These notations can be used to preserve relevant information or context that should be carried over to subsequent prompts.", "example": ""},
-                                "suggestions": {"instruction": "A parameter that allows the module to provide suggestions for improving efficiency in future prompt sequences. These suggestions will be reviewed by the user after the entire prompt sequence is fulfilled.", "example": ""},
-                                "abort": {"instruction": "if you cannot fullfil the request,", "example": "False"},
-                                "prompt_as_previous": {"instruction": "this is a user end declaration; if this is visible that means that the request portion of the prompt will change such that the previous response data will be available if needed", "example": ""},
-                                "request_chunks": {"instruction": "you may request that the previous chunk data be prompted again, if selected, the query itterate once more with the previous chunk included in the prompt.", "example": "False"},
-                                "token_adjustment": {"instruction": "generally the token size of incoming queries is going to be static, because of this, if it will provide better results to increase or decrease the future allotment, place a number -100 up to 100 for a percentage adjustment for the remainder of the chunks and data", "example": "0"},
-                                }
+    def __init__(self)->None:
+        self.default_instructions = {
+            "api_response": {"instruction": "Place response to prompt here.", "example": "This is the reply to your request."},
+            "additional_responses": {"instruction": "Marking 'True' initiates a loop which continues to send the current chunk's prompt until the module returns a 'False' value.", "example": "false"},
+            "generate_title": {
+                "instruction": "Generate a short and concise title for this query, using underscores instead of spaces and avoiding special characters. The title should not exceed 30 characters to ensure compatibility with file systems.",
+                "example": "Short_Title_for_Query"
+                },
+            "notation": {"instruction": "This value allows for communication between modules throughout the query iterations. These notations can be used to preserve relevant information or context for subsequent prompts.", "example": "Selecting additional responses due to insufficient completion tokens."},
+            "suggestions": {"instruction": "This parameter allows the module to provide suggestions for improving efficiency in future prompt sequences.", "example": "Consider batching queries to reduce server load"},
+            "abort": {"instruction": "If you cannot fulfill the request, respond with this value as 'True'. Leave a detailed reason as to why the query stream was aborted in 'suggestions'", "example": "False"},
+            "prompt_as_previous": {"instruction": "This is a user-end declaration. If this is visible, the request portion of the prompt will change to include previous response data, if needed", "example": "True"},
+            "request_chunks": {"instruction": "Request to prompt again the previous chunk data. If selected, the query will iterate once more with the previous data chunk included in the prompt.", "example": "False"},
+            "token_adjustment": {"instruction": "Suggest percentage adjustments, between -100 up to 100, for the future token allotment. If it will provide better results to increase or decrease the future allotment, place a number.", "example": "0"},
+
+            "context_preservation": {"instruction": "Maintain and reference relevant context from previous iterations. Store context data securely and efficiently for accurate response generation.", "example": "Context from previous iteration stored: User preference for X identified."},
+            "error_handling": {"instruction": "Identify and handle errors gracefully. Provide clear error messages and log errors for debugging purposes.", "example": "Error identified: Data format mismatch. Logged for review."},
+            "response_validation": {"instruction": "Validate the response for accuracy, relevance, and completeness before finalizing. Implement checks for coherence and pertinence.", "example": "Response validated for accuracy and relevance."},
+            "user_feedback": {"instruction": "Incorporate user feedback mechanism post-response or at the end of the sequence. Use feedback to refine future interactions.", "example": "User feedback requested on response clarity."},
+            "adaptive_token_adjustment": {"instruction": "Automatically suggest token adjustments based on historical query lengths and complexities. Adjust token size dynamically.", "example": "Token size increased by 10% based on previous complex queries."},
+            "documentation": {"instruction": "Provide a detailed example for this instruction as documented in the system's manual.", "example": "Refer to page 42 for 'context_preservation' usage examples."},
+            "performance_metrics": {"instruction": "Track and report performance metrics such as response time, accuracy, or relevance for each iteration.", "example": "Response time: 2 seconds, Accuracy: 95%."},
+            "dynamic_chunk_management": {"instruction": "Adjust chunk sizes dynamically based on the complexity and nature of incoming data.", "example": "Chunk size increased for complex image processing task."},
+            "ui_interaction": {"instruction": "Provide a user-friendly interface for module interactions, displaying progress and allowing adjustments.", "example": "UI updated with query progress and adjustment options."},
+            "security_privacy": {"instruction": "Ensure data security and user privacy. Implement features for secure data handling and confidentiality.", "example": "User data encrypted and access logs maintained for privacy compliance."},
+            "scalability_resource_management": {"instruction": "Optimize system scalability and efficient resource management for handling larger datasets and increased queries.", "example": "System resources adjusted for 20% increased query load."},
+            "multilingual_support": {"instruction": "Provide support for multiple languages in processing and responding to queries.", "example": "Spanish language processing enabled for current query."},
+            "customization_flexibility": {"instruction": "Allow customization in response formats and system integration as per user needs.", "example": "Custom response format applied as per user settings."}
+
+            }
+
+        
         self.instructions = []
-    def get_instructions(self,instruction_number=None):
+    def get_instructions(self,instruction_number:int=None)->dict:
         if len(self.instructions)==0:
             self.add_instructions()
         instruction_number = instruction_number or -1
         return self.instructions[instruction_number]
-    def get_instructions_bools(self,parameters):
+    
+    def get_instructions_bools(self,parameters:dict)->dict:
         for parameter,value in parameters.items():
             parameters[parameter] = True if value else False
         return parameters
-    def get_instructions_text_values(self,instruction_bools,parameters):
+    
+    def get_instructions_text_values(self,instruction_bools:dict,parameters:dict)->dict:
         parameter_text_values = {}
         for parameter,value in instruction_bools.items():
             if value:
                 parameter_text_values[parameter] = self.default_instructions[parameter]['instruction'] if is_bool(parameters[parameter]) else  parameters[parameter]
         return parameter_text_values
-    def get_instructions_text(self,instructions_js):
+    def get_instructions_text(self,instructions_js:dict)->dict:
         """
         Retrieves instructions for the conversation.
 
@@ -47,7 +71,7 @@ class InstructionManager:
                     i+=1
             instructions += '\nbelow is an example of the expected json dictionary response format, with the default inputs:\n' + str(example_format).replace("'",'"')
         return instructions
-    def add_instructions(self,all_true=False):
+    def add_instructions(self,all_true:bool=False)->None:
         print('adding instructions')
         if len(self.instructions)==0:
             instruction_display,instruction_bools,instructions_text_values,instructions_text=self.get_instructions_values(all_true=all_true)
@@ -55,7 +79,8 @@ class InstructionManager:
         else:
             last_instructions = self.instructions[-1]
         self.instructions.append(last_instructions)
-    def get_instructions_values(self,all_true = False,**kwargs):
+        
+    def get_instructions_values(self,all_true:bool= False,**kwargs)->(bool,dict,dict,str):
         parameters = {}
         for parameter in self.default_instructions.keys():
             value = kwargs.get(parameter,False) if all_true == False else True
@@ -65,7 +90,8 @@ class InstructionManager:
         instructions_text_values= self.get_instructions_text_values(instruction_bools,parameters)
         instructions_text = self.get_instructions_text(instructions_js=instructions_text_values)
         return instruction_display,instruction_bools,instructions_text_values,instructions_text
-    def update_instructions(self,instruction_number,**kwargs):
+    
+    def update_instructions(self,instruction_number:int,**kwargs)->None:
         
         instruction_display,instruction_bools,instructions_text_values,instructions_text=self.get_instructions_values(**kwargs)
         self.instructions[instruction_number]={'instruction_display':instruction_display,'instructions_bools':instruction_bools,"instructions_text_values":instructions_text_values,"instructions_text":instructions_text}

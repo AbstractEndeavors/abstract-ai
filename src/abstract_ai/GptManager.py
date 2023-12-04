@@ -25,6 +25,7 @@ from abstract_gui import (
     AbstractWindowManager,
     NextReadManager,
     AbstractBrowser,
+    expandable
     
 )
 from abstract_utilities import (
@@ -132,7 +133,7 @@ class GptManager:
         and kicks off the UI's main loop.
  	"""
         self.window_mgr = AbstractWindowManager()
-        self.window_name = self.window_mgr.add_window(window_name="Chat GPT Console",title="Chat GPT Console",layout=get_total_layout())
+        self.window_name = self.window_mgr.add_window(window_name="Chat GPT Console",title="Chat GPT Console",layout=get_total_layout(),**expandable())
         self.window_mgr.set_current_window(self.window_name)
         self.window = self.window_mgr.get_window_method(self.window_name)
         self.api_call_list=[]
@@ -170,7 +171,7 @@ class GptManager:
         
         self.new_response_path_list=[]
         self.response_directories_list=[]
-        self.response_path_list = self.aggregate_conversations()
+        #self.response_path_list = self.aggregate_conversations()
         self.initialize_keys()
         self.loop_one=False
         self.bool_loop=False
@@ -247,6 +248,7 @@ class GptManager:
                           text_to_key('prompt_data section forward'),
                           ]
         self.chunk_history_name = self.history_mgr.add_history_name('chunk')
+        self.request_history_name = self.history_mgr.add_history_name('request')
         self.toke_percentage_dropdowns = ['-COMPLETION_PERCENTAGE-',
                                           '-PROMPT_PERCENTAGE-']
         self.additions_key_list = self.browser_mgr.key_list+['-FILE_TEXT-',
@@ -1110,7 +1112,7 @@ class GptManager:
         values=values or self.window_mgr.get_values()
         event=event or self.window_mgr.get_event()
         window=window or self.window
-        self.browser_mgr.handle_event(values,event,window)
+        self.browser_mgr.handle_event(event,values,window)
         
     def right_click_event_query(self,values=None,event=None,window=None):
         values=values or self.window_mgr.get_values()
@@ -1119,6 +1121,7 @@ class GptManager:
         self.right_click_mgr.right_click_event(values,event,window)
         
     def while_window(self,event,values,window):
+        print(event)
         self.event,self.values,window=event,values,window
         if self.loop_one == False:
             

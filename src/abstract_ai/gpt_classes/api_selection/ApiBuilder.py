@@ -17,13 +17,13 @@ class ApiManager:
         load_openai_key(): Loads the OpenAI API key for use in requests.
         get_header(): Generates the request headers for the API calls.
     """
-    def __init__(self,content_type=None,header=None,api_env:str=None,api_key:str=None):
+    def __init__(self,content_type=None,header=None,api_env:str=None,api_key:str=None)->None:
         self.content_type=content_type or 'application/json'
         self.api_env=api_env or 'OPENAI_API_KEY'
         self.api_key=api_key or self.get_openai_key()
         self.header=header or self.get_header()
         self.load_openai_key()
-    def get_openai_key(self):
+    def get_openai_key(self)->str:
         """
         Retrieves the OpenAI API key from the environment variables.
 
@@ -35,12 +35,12 @@ class ApiManager:
             str: The OpenAI API key.
         """
         return get_env_value(key=self.api_env)
-    def load_openai_key(self):
+    def load_openai_key(self)->None:
         """
         Loads the OpenAI API key for authentication.
         """
         openai.api_key = self.api_key
-    def get_header(self):
+    def get_header(self)->dict:
         """
         Generates request headers for API call.
         

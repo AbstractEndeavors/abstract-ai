@@ -87,7 +87,6 @@ class AbstractNavigationManager:  # Replace with your actual class name
             nav_data['section_number'] = max(0, min(current_section_number + increment, max_value))
             nav_data["number"]=0
         elif nav_data['data_type'] in ["chunk", "query"]:
-            print(nav_data['data_type'],current_section_number)
             reference_obj = reference_obj[current_section_number]
             current_chunk_number = self.selfs.display_number_tracker['chunk_number']
             current_chunk_number = get_adjusted_number(current_chunk_number, reference_obj)

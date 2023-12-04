@@ -1,7 +1,6 @@
 import os
 from abstract_gui import AbstractBrowser,text_to_key,make_component,ensure_nested_list,expandable,RightClickManager
 from . import ModelManager
-
 def get_screen_dimensions(height,width,max_size=None):
     screen_width, screen_height = make_component("Window",title='screen_size',layout=[[]]).get_screen_size()
     def calculate_size(percentage, screen_measure):
@@ -33,9 +32,9 @@ def get_num_list():
     return num_list
 
 def generate_bool_text(title,args={}):
-    if "key" not in args:
-        args["key"]=text_to_key(text=title,section='text')
-    return make_component("Frame",title, layout=[[make_component("Multiline",args=args)]],**expandable())
+
+        
+    return make_component("Frame",title, layout=[[get_right_click_multi(key=text_to_key(text=title,section='text'),args=args)]],**expandable())
 def get_tab_layout(title,layout=None):
     if not layout:
         layout = get_right_click_multi(key=text_to_key(title),args={**expandable(size=(None, 5))})
@@ -282,7 +281,7 @@ def get_progress_frame():
                 [
                     make_component("InputText", 'Not Sending', key='-PROGRESS_TEXT-', background_color="light blue", auto_size_text=True, size=(10, 20)),
                     make_component("ProgressBar", 100, orientation='h', size=(10, 20), key='-PROGRESS-'),
-                    make_component("Input", default_text='0', key=text_to_key("query count"), size=(10, 20), disabled=True, enable_events=True)
+                    make_component("Input", default_text='0', key=text_to_key("query count"), size=(30, 20), disabled=True, enable_events=True)
                 ]
             ]),
             make_component("Frame", 'query title', layout=[
@@ -325,7 +324,7 @@ def get_chunked_sections():
         [make_component("Push"),make_component("Button",button_text="<-",key=text_to_key("chunk back"),enable_events=True),
          make_component("input",default_text='0',key=text_to_key("chunk number"),size=(4,1)),
          make_component("Button",button_text="->",key=text_to_key("chunk forward"),enable_events=True),make_component("Push")],
-        [make_component("Frame",'chunk sectioned data', layout=[[make_component("Multiline",key=text_to_key('chunk sectioned data'),enable_events=True,**expandable())]],**expandable())]]
+        [make_component("Frame",'chunk sectioned data', layout=[[get_right_click_multi(key=text_to_key('chunk sectioned data'),args={"enable_events":True,**expandable()})]],**expandable())]]
             
 def get_prompt_data_section():
     return [[make_component("Button",button_text="CREATE CHUNK",key="-CREATE_CHUNK-",auto_size_text=True, enable_events=True),
@@ -335,14 +334,14 @@ def get_prompt_data_section():
             [make_component("Push"),make_component("Button",button_text="<-",key=text_to_key("prompt_data section back"),enable_events=True),
              make_component("input",default_text='0',key=text_to_key("prompt_data section number"),size=(4,1)),
              make_component("Button",button_text="->",key=text_to_key("prompt_data section forward"),enable_events=True),make_component("Push")],
-            [make_component("Frame",'prompt_data data', layout=[[make_component("Multiline",key=text_to_key('prompt_data data'),enable_events=True,**expandable())]],**expandable())]]
+            [make_component("Frame",'prompt_data data', layout=[[get_right_click_multi(key=text_to_key('prompt_data data'),args={"enable_events":True,**expandable()})]],**expandable())]]
 
 def get_request_section():
     return [
         [make_component("Push"),make_component("Button",button_text="<-",key=text_to_key("request section back"),enable_events=True),
              make_component("input",default_text='0',key=text_to_key("request section number"),size=(4,1)),
              make_component("Button",button_text="->",key=text_to_key("request section forward"),enable_events=True),make_component("Push")],
-        [make_component("Frame",'', layout=[[make_component("Multiline",key=text_to_key('request'),enable_events=True,**expandable())]],**expandable())]]
+        [make_component("Frame",'', layout=[[get_right_click_multi(key=text_to_key('request'),args={"enable_events":True,**expandable()})]],**expandable())]]
 
 def get_query_section():
     return [
@@ -352,7 +351,7 @@ def get_query_section():
         [make_component("Push"),make_component("Button",button_text="<-",key=text_to_key("query back"),enable_events=True),
          make_component("input",default_text='0',key=text_to_key("query number"),size=(4,1)),
          make_component("Button",button_text="->",key=text_to_key("query forward"),enable_events=True),make_component("Push")],
-        [make_component("Frame",'', layout=[[make_component("Multiline",key=text_to_key('query'),**expandable())]],**expandable())]]
+        [make_component("Frame",'', layout=[[get_right_click_multi(key=text_to_key('query'),args={**expandable()})]],**expandable())]]
 
 def get_instructions():
     layout = []

@@ -8,15 +8,15 @@ class PromptManager:
     def __init__(self,
                  instruction_mgr=None,
                  model_mgr=None,
-                 prompt_data=None,
-                 request_data=None,
-                 instruction_data = None,
-                 role='assistant',
-                 completion_percentage=40,
-                 notation=None,
-                 chunk_token_distribution_number=None,
-                 chunk_number=None,
-                 chunk_type=None):
+                 prompt_data:(str or list)=None,
+                 request_data:(str or list)=None,
+                 instruction_data:(str or list)= None,
+                 role:str='assistant',
+                 completion_percentage:int=40,
+                 notation:str=None,
+                 chunk_token_distribution_number:int=None,
+                 chunk_number:int=None,
+                 chunk_type:str=None)->None:
         """
         Initialize the PromptManager.
 
@@ -59,32 +59,31 @@ class PromptManager:
         self.chunk_number=chunk_number or 0
         self.chunk_token_distribution_number=chunk_token_distribution_number or chunk_token_distribution_number
         self.total_chunks =10
-        print('running prompt manager...')
-        print(f'request data = {self.request_data}')
         self.chunk_token_distributions=self.calculate_token_distribution(request_data=self.request_data,
                                                                          notation=self.notation,
                                                                          max_tokens=self.model_mgr.selected_max_tokens,
                                                                          completion_percentage=self.completion_percentage,
                                                                          prompt_data=self.prompt_data)
         
-    def update_managers(self,instruction_mgr=None,model_mgr=None):
+    def update_managers(self,instruction_mgr=None,model_mgr=None)->None:
         self.instruction_mgr = instruction_mgr or self.instruction_mgr
         self.model_mgr=model_mgr or self.model_mgr
     def update_request_and_prompt_data(self,model_mgr=None,
                                        instruction_mgr=None,
-                                       prompt_data=None,
-                                       request_data=None,
-                                       instruction_data=None,
-                                       completion_percentage=None,
-                                       notation=None,
-                                       chunk_type=None,
-                                       role=None,
-                                       reprocess_chunks=True):
+                                       prompt_data:(str or list)=None,
+                                       request_data:(str or list)=None,
+                                       instruction_data:(str or list)=None,
+                                       completion_percentage:int=None,
+                                       notation:str=None,
+                                       chunk_type:str=None,
+                                       role:str=None,
+                                       reprocess_chunks:bool=True)->None:
         previous_completion_percentage = self.completion_percentage
         previous_prompt_data = self.prompt_data
         previous_request_data = self.request_data
         previous_max_tokens = self.model_mgr.selected_max_tokens
-        max_tokens=self.model_mgr.selected_max_tokens
+        if model_mgr:
+            self.model_mgr=model_mgr
         self.update_managers(instruction_mgr=None,model_mgr=None)
         self.prompt_data=prompt_data or self.prompt_data
         self.role=role or self.role
@@ -107,22 +106,22 @@ class PromptManager:
                                                                                  completion_percentage=self.completion_percentage,
                                                                                  )
     def calculate_token_distribution(self,
-                                     request_data=None,
-                                     prompt_data=None,
-                                     instruction_data=None,
-                                     notation=None,
-                                     max_tokens=None,
-                                     completion_percentage=None,
-                                     prompt_guide=None,
-                                     assume_bot_notation=True):
+                                     request_data:(str or list)=None,
+                                     prompt_data:(str or list)=None,
+                                     instruction_data:(str or list)=None,
+                                     notation:str=None,
+                                     max_tokens:int=None,
+                                     completion_percentage:int=None,
+                                     prompt_guide:str=None,
+                                     assume_bot_notation:bool=True)->list[dict]:
         
         def get_token_calcs(i,
-                            chunk_data,
-                            total_chunks,
-                            initial_prompt_token_length,
-                            prompt_token_desired,
-                            initial_completion_token_length,
-                            completion_token_desired):
+                            chunk_data:str,
+                            total_chunks:int,
+                            initial_prompt_token_length:int,
+                            prompt_token_desired:int,
+                            initial_completion_token_length:int,
+                            completion_token_desired:int)->dict:
             """
             Calculates token usage statistics for a given chunk of data.
 
@@ -167,13 +166,13 @@ class PromptManager:
                 }
             return chunk_js
 
-        def get_token_distributions(prompt_token_desired,
-                                    initial_prompt_token_length,
-                                    total_chunk_data,
-                                    fictitious_chunk_token_length,
-                                    completion_token_desired,
-                                    initial_completion_token_length,
-                                    chunk_type):
+        def get_token_distributions(prompt_token_desired:int,
+                                    initial_prompt_token_length:int,
+                                    total_chunk_data:str,
+                                    fictitious_chunk_token_length:int,
+                                    completion_token_desired:int,
+                                    initial_completion_token_length:int,
+                                    chunk_type:str)->list[dict]:
             """
             Computes token distributions for all chunks of data given the desired token allocations for prompts and completions.
 
@@ -262,17 +261,17 @@ class PromptManager:
         return token_distributions
            
     def create_prompt_guide(self,
-                            pre_process=False,
-                            chunk_data=None,
-                            request=None,
-                            instructions=None,
-                            chunk_token_distribution_number=None,
-                            chunk_number=None,
-                            total_chunks=None,
-                            notation=None,
-                            generate_title=None,
-                            request_chunks=None,
-                            prompt_as_previous=None):
+                            pre_process:bool=False,
+                            chunk_data:str=None,
+                            request:str=None,
+                            instructions:str=None,
+                            chunk_token_distribution_number:int=None,
+                            chunk_number:int=None,
+                            total_chunks:int=None,
+                            notation:str=None,
+                            generate_title:str=None,
+                            request_chunks:str=None,
+                            prompt_as_previous:str=None)->str:
         """
         This method encapsulates the process of creating formatted communication for the current data chunk,
         which includes forming the prompt, notation, and other required fields for personalized bot communication.
@@ -290,13 +289,13 @@ class PromptManager:
         Returns:
             str: A formatted communication guide.
         """
-        def get_delimeters():
+        def get_delimeters()->str:
             return '\n-----------------------------------------------------------------------------\n'
-        def get_for_prompt(title,data):
+        def get_for_prompt(title:str,data:str)->str:
             if data:
                 return f'#{title}#'+'\n\n'+f'{data}'
             return ''
-        def get_chunk_header(current_chunk,total_chunks,chunk_data):
+        def get_chunk_header(current_chunk:int,total_chunks:int,chunk_data:str)->(None or str):
             if total_chunks in [0,'0'] or chunk_data in ['',None]:
                 return None
             current_chunk = current_chunk or 0
@@ -333,15 +332,15 @@ class PromptManager:
         return prompt_data_source
 
     def create_prompt(self,
-                      chunk_token_distribution_number=0,
-                      chunk_number=0,
-                      chunk_token_distribution_data=None,
-                      notation=None,
-                      instructions=None,
-                      generate_title=None,
-                      request_chunks=None,
-                      prompt_as_previous=None,
-                      token_adjustment=None):
+                      chunk_token_distribution_number:int=0,
+                      chunk_number:int=0,
+                      chunk_token_distribution_data:dict=None,
+                      notation:str=None,
+                      instructions:str=None,
+                      generate_title:str=None,
+                      request_chunks:str=None,
+                      prompt_as_previous:str=None,
+                      token_adjustment:int=None)->dict:
         """
         This method forms a dictionary embodying the prompt for the chatbot. This includes the model name,
         the role of the issuer, the content, and other variables. The method also takes an optional distribution number

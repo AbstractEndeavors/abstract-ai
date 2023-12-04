@@ -15,7 +15,7 @@ class ModelManager:
         _get_models_by_endpoint(endpoint): Returns all models associated with the specified endpoint.
         _get_max_tokens_by_model(model_name): Returns the maximum tokens associated with the specified model.
     """
-    def __init__(self, input_model_name=None, input_endpoint=None, default_selection=True):
+    def __init__(self, input_model_name:str=None, input_endpoint:str=None, default_selection:bool=True)->None:
 
         self.all_models = [{'model': 'whisper-1', 'endpoint': 'https://api.openai.com/v1/audio/transcriptions', 'tokens': None},
                        {'model': 'whisper-1', 'endpoint': 'https://api.openai.com/v1/audio/translations', 'tokens': None},
@@ -66,26 +66,27 @@ class ModelManager:
                     self.selected_model_name = self.default_model_info['model']
                     self.selected_endpoint = self.default_model_info['endpoint']
                     self.selected_max_tokens = self.default_model_info['tokens']
-    def get_all_values(self,key):
+    def get_all_values(self,key:str)->list:
         all_values = []
         for value in self.all_models:
             if key in value:
                 if value[key] not in all_values:
                     all_values.append(value[key])
         return all_values
-    def _get_all_values(self, key):
+    
+    def _get_all_values(self, key:str)->list:
         return list(set([value[key] for value in self.all_models if key in value]))
 
-    def _get_endpoint_by_model(self, model_name):
+    def _get_endpoint_by_model(self, model_name:str)->(dict or None):
         for model in self.all_models:
             if model["model"] == model_name:
                 return model["endpoint"]
         return None
 
-    def _get_models_by_endpoint(self, endpoint):
+    def _get_models_by_endpoint(self, endpoint:str)->list:
         return [model["model"] for model in self.all_models if model["endpoint"] == endpoint]
 
-    def _get_max_tokens_by_model(self, model_name):
+    def _get_max_tokens_by_model(self, model_name:str)->(dict or None):
         for model in self.all_models:
             if model["model"] == model_name:
                 return model["tokens"]
