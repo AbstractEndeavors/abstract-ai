@@ -1,0 +1,11 @@
+The scripts presented in this chunk focus on several features for extracting and processing information from smart contracts.
+
+In `pragmaVariableManager.py`, two functions, `splitAndSee()` and `getPragAll()`, process pragma version details. `splitAndSee()` takes a pragma object and parses it to extract details and perform some operations depending upon certain conditions. `getPragAll()` retrieves all details related to the pragma version.
+
+Then, `flatten_script.py` contains a file flattening function `flatten_it()`, it takes the original file path and current file directory as arguments, and it flattens the original file structure into a simplified one, making it easier to read and understand. The script uses Node.js and npm for the flattening process.
+
+`spdxManager.py` deals with the SPDX-License-Identifier in the smart contracts. It extracts SPDX related information from a smart contract and manages it accordingly. It checks the license related information and updates it into the fileInfo and lineTrack dictionaries.
+
+`node_js_install.py` is responsible for installing Node.js in a Unix or Darwin(Mac) environment. It checks if Node.js is already installed, if not, it installs Node.js using system commands.
+
+`contractVariableManager.py` doesn't provide any functional code in this chunk and is cut-off.

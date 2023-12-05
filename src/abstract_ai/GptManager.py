@@ -1,7 +1,7 @@
 # DEPENDENCIES #
 import os
 import pyperclip
-from . import (RightClickManager,
+from __init__ import (RightClickManager,
                get_total_layout,
                instructions_keys,
                all_token_keys,
@@ -1118,7 +1118,7 @@ class GptManager:
         values=values or self.window_mgr.get_values()
         event=event or self.window_mgr.get_event()
         window=window or self.window
-        self.right_click_mgr.right_click_event(values,event,window)
+        self.right_click_mgr.right_click_event(event,values,window)
         
     def while_window(self,event,values,window):
         print(event)

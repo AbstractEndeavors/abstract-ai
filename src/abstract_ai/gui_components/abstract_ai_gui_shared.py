@@ -1,6 +1,7 @@
 import os
-from abstract_gui import AbstractBrowser,text_to_key,make_component,ensure_nested_list,expandable,RightClickManager
-from . import ModelManager
+from abstract_gui import text_to_key,make_component,ensure_nested_list,expandable,RightClickManager
+from __init__ import ModelManager
+from gui_components.abstract_browser import AbstractBrowser
 def get_screen_dimensions(height,width,max_size=None):
     screen_width, screen_height = make_component("Window",title='screen_size',layout=[[]]).get_screen_size()
     def calculate_size(percentage, screen_measure):
