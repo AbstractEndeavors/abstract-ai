@@ -356,6 +356,7 @@ class PromptManager:
         Returns:
             dict: A dictionary representing the prompt for the chatbot.
         """
+        print(prompt_as_previous)
         self.prompt_as_previous=prompt_as_previous
         self.prompt =""
         total_chunks =0
