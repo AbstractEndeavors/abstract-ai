@@ -1,11 +1,11 @@
 from abstract_gui import expandable,make_component,ensure_nested_list 
 from os.path import basename
 import os
-def clean_list(list_obj=[]):
+def clean_list(list_obj:list=[])->list:
     while '' in list_obj:
         list_obj.remove('')
     return list_obj
-def construct_layout(files_list,window_size):
+def construct_layout(files_list:list,window_size:(int,int))->list:
     result=''
     # The main layout construction code
     mass_files = [
@@ -24,11 +24,11 @@ def construct_layout(files_list,window_size):
     layout.append(ensure_nested_list(make_component("Column",layout=ensure_nested_list(column_layout),**expandable(size=(int(window_size[0]),None),scroll_vertical=True))))
     return layout
 
-def read_from_file(file_path):
+def read_from_file(file_path:str)->str:
     with open(file_path, 'r') as f:
         return f.read()
 
-def read_me_window(file_path_list=[]):
+def read_me_window(file_path_list:list=[])->(str,list):
     window_size = make_component("Window").get_screen_size()
     window_size= [int(window_size[0]*0.30),int(window_size[1]*0.8)]
     layout = construct_layout(file_path_list,window_size)
@@ -82,7 +82,7 @@ def read_me_window(file_path_list=[]):
     
     window.close()
     return result,files_list
-def generate_overview(values,files_list):
+def generate_overview(values:dict,files_list:list)->str:
     module_name = values["-MODULE_NAME-"]
     prompt_intro = f"""i have a module called {module_name}, id like to make a thurough readme for it
 

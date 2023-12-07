@@ -17,12 +17,84 @@ Classes and Functions:
 
 """
 import os
-from abstract_gui import sg,get_event_key_js,make_component,text_to_key
+from abstract_gui import sg,get_event_key_js,make_component,text_to_key,ensure_nested_list
 from abstract_utilities import eatAll
 def capitalize(text):
     if text:
         text=text[0].upper()+text[1:]
     return text
+class filesListManager:
+    def __init__(self):
+        self.files_list_dict={}
+    def check_files_list_key(self,key):
+        if key not in self.files_list_dict:
+            self.files_list_dict[key]=[]
+        return self.files_list_dict[key]
+    def clear_list(self,key):
+        self.files_list_dict[key]=[]
+        return []
+    def revise_display_names(self,key):
+        file_names_dict={}
+        for i,file_refference in enumerate(self.files_list_dict[key]):
+            file_name = file_refference['filename']
+            if file_name not in file_names_dict:
+                file_names_dict[file_name]=0
+            else:
+                file_names_dict[file_name]+=1
+            display_name = file_refference['filename'] if file_names_dict[file_name] == 0 else f"{file_refference['filename']} ({file_names_dict[file_name]})"
+            self.files_list_dict[key][i]['display_name'] = display_name
+    def is_display_name(self,key,display_name):
+        for i,file_refference in enumerate(self.check_files_list_key(key)):
+            if display_name == file_refference['display_name']:
+                return i
+        return display_name
+    
+    def add_to_files_list_dict(self,key,file_path):
+        directory = os.path.dirname(file_path)
+        filename = os.path.basename(file_path)
+        for i,file_refference in enumerate(self.check_files_list_key(key)):
+            if file_refference['filepath'] == file_path:
+                return
+        self.files_list_dict[key].append({"dirname":directory,"filename":filename,"filepath":file_path,"display_name":filename})
+        self.revise_display_names(key)
+    def return_display_names(self,key):
+        display_names = []
+        for file_refference in self.files_list_dict[key]:
+            display_names.append(file_refference['display_name'])
+        return display_names
+    def re_arrange_display(self,key,position_numbers):
+        current_positions = [self.files_list_dict[key][position_numbers[0]],self.files_list_dict[key][position_numbers[1]]]
+        new_poisitions = [current_positions[1],current_positions[0]]
+        self.files_list_dict[key][position_numbers[0]]=new_poisitions[0]
+        self.files_list_dict[key][position_numbers[1]]=new_poisitions[1]
+    def remove_item(self,key,display_number):
+        new_key_refference = []
+        display_number = self.is_display_name(key,display_number)
+        for i,file_refference in enumerate(self.files_list_dict[key]):
+            if i != display_number:
+                new_key_refference.append(self.files_list_dict[key][i])
+        self.files_list_dict[key]=new_key_refference
+        return self.return_display_names(key)
+    def move_up(self,key,display_number):
+        display_number = self.is_display_name(key,display_number)
+        if display_number >0:
+            position_numbers = display_number-1,display_number
+            self.re_arrange_display(key,position_numbers)
+        return self.return_display_names(key)
+    def move_down(self,key,display_number):
+        display_number = self.is_display_name(key,display_number)
+        if display_number < len(self.files_list_dict[key])-1:
+            position_numbers = display_number,display_number+1
+            self.re_arrange_display(key,position_numbers)
+        return self.return_display_names(key)
+    def get_file_path(self,key,display_number):
+        display_number = self.is_display_name(key,display_number)
+        return self.files_list_dict[key][display_number]['filepath']
+    def get_file_path_list(self,key):
+        path_list = []
+        for file_refference in self.check_files_list_key(key):
+            path_list.append(file_refference['filepath'])
+        return path_list
 class AbstractBrowser:
     """
     This class aims to provide a unified way of browsing through different sources.
@@ -41,11 +113,12 @@ class AbstractBrowser:
             self.window = make_component('Window','File/Folder Scanner', layout=self.get_scan_browser_layout())
         self.event = None
         self.values = None
+        self.files_list_mgr = filesListManager()
         self.mode_tracker={}
         self.scan_mode = "all"
         self.history = [os.getcwd()]
         self.modes = ['-SCAN_MODE_FILES-','-SCAN_MODE_FOLDERS-','-SCAN_MODE_ALL-']
-        self.key_list = ['-BROWSER_LIST-','-CLEAR_LIST-','-ADD_TO_LIST-',"-FILES_BROWSER-","-DIR-","-DIRECTORY_BROWSER-","-FILES_LIST-","-SCAN_MODE_ALL-","-SELECT_HIGHLIGHTED-","-SCAN-", "-SELECT_HIGHLIGHTED-", "-MODE-", "-BROWSE_BACKWARDS-", "-BROWSE_FORWARDS-"]+self.modes
+        self.key_list = ['-BROWSER_LIST-','-CLEAR_LIST-','-REMOVE_FROM_LIST-','-MOVE_UP_LIST-','-MOVE_DOWN_LIST-','-ADD_TO_LIST-',"-FILES_BROWSER-","-DIR-","-DIRECTORY_BROWSER-","-FILES_LIST-","-SCAN_MODE_ALL-","-SELECT_HIGHLIGHTED-","-SCAN-", "-SELECT_HIGHLIGHTED-", "-MODE-", "-BROWSE_BACKWARDS-", "-BROWSE_FORWARDS-"]+self.modes
 
     def handle_event(self,event,values,window):
           
@@ -75,36 +148,29 @@ class AbstractBrowser:
             """
             
         # More complex layout with additional elements
-        checkboxes_layout = [
-            [sg.Checkbox('All', default=True, key=text_to_key(text='scan mode all',section=section)),sg.Checkbox('Files', key=text_to_key(text='file browser',section=section))],
-            [sg.Checkbox('Folders', key=text_to_key(text='scan mode folders',section=section))]
-        ]
-
         browser_buttons_layout = [
-            sg.FolderBrowse('Folders', key=text_to_key(text='directory browser',section=section)),
-            sg.FileBrowse('Files', key=text_to_key(text='file browser',section=section)),
-            
+            sg.Button('All Scan Mode', key=text_to_key(text='mode',section=section)),sg.Checkbox('All', default=True, key=text_to_key(text='scan mode all',section=section)),sg.Checkbox('Files', key=text_to_key(text='file browser',section=section)),sg.Checkbox('Folders', key=text_to_key(text='scan mode folders',section=section))
         ]
         listboxes_layout=[]
-        listboxes_layout.append(sg.Listbox(values=[], size=(50, 10), key=text_to_key(text='browser list',section=section), enable_events=True))
-        listboxes_layout.append(sg.Listbox(values=[], size=(50, 10), key=text_to_key(text='files list',section=section), enable_events=True))
-        control_buttons_layout = [
-            sg.Button('Scan', key=text_to_key(text='scan',section=section)),
-            sg.Button('<-', key=text_to_key(text='browse backwards',section=section)),
-            sg.Button('All Scan Mode', key=text_to_key(text='mode',section=section)),
-            sg.Button('->', key=text_to_key(text='browse forwards',section=section)),
-            sg.Button('Add', key=text_to_key(text='add_to_list',section=section)),
-            sg.Button('Clear', key=text_to_key(text='clear list',section=section))
-        ] + extra_buttons
+        listboxes_layout.append(sg.Frame('browser',layout=ensure_nested_list([[sg.Listbox(values=[], size=(50, 10), key=text_to_key(text='browser list',section=section), enable_events=True)],
+                                                                             [sg.Push(),sg.Button('<-', key=text_to_key(text='browse backwards',section=section)),
+                                                                              sg.Button('Scan', key=text_to_key(text='scan',section=section)),
+                                                                              sg.Button('->', key=text_to_key(text='browse forwards',section=section)),sg.Button('ADD', key=text_to_key(text='add_to_list',section=section)),sg.Push()]])))
 
-        return [[sg.Text('Directory to scan:'), sg.InputText(os.getcwd(),key=text_to_key(text='dir',section=section))],
-            [sg.Column([listboxes_layout,browser_buttons_layout])],
-            [sg.Column(checkboxes_layout)],
-            control_buttons_layout
-        ]
+        listboxes_layout.append(sg.Frame('files',layout=ensure_nested_list([[sg.Listbox(values=[], size=(50, 10), key=text_to_key(text='files list',section=section), enable_events=True)],
+                                                                             [sg.Push(),sg.Button('UP', key=text_to_key(text='move up list',section=section)),sg.Button('DOWN', key=text_to_key(text='move down list',section=section)),
+                                                                              sg.Button('REMOVE', key=text_to_key(text='remove from list',section=section)),
+                                                                              sg.Button('Clear', key=text_to_key(text='clear list',section=section)),sg.Push()]])))
 
+
+        layout = [[sg.Text('Directory to scan:'), sg.InputText(os.getcwd(),key=text_to_key(text='dir',section=section)),sg.FolderBrowse('Folders', key=text_to_key(text='directory browser',section=section)),sg.FileBrowse('Files', key=text_to_key(text='file browser',section=section))],
+            [sg.Column([listboxes_layout,browser_buttons_layout])]]
+        if extra_buttons:
+            layout.append(extra_buttons)         
+        return layout
     def while_static(self,event_key_js,values,window):
         self.event_key_js,self.values,self.window=event_key_js,values,window
+        self.section_key = key = self.event_key_js['section']
         if self.event_key_js['found'] == "-FILES_BROWSER-":
             self.browse_update(key=self.event_key_js['-DIR-'],args={"value":self.values[self.event_key_js["-FILES_BROWSER-"]]})
         if self.event_key_js['found'] == "-DIRECTORY_BROWSER-":
@@ -143,18 +209,29 @@ class AbstractBrowser:
                 self.mode_tracker[self.event_key_js['-MODE-']]=self.mode_tracker[self.event_key_js['-MODE-']][1:]
             self.window.Element(self.event_key_js['-MODE-']).update(text=f"{capitalize(self.scan_mode)} Scan Mode")
             self.scan_it(self.return_directory())
+        if self.event_key_js['found'] in ['-MOVE_UP_LIST-','-MOVE_DOWN_LIST-','-REMOVE_FROM_LIST-']:
+            list_value = self.values[self.event_key_js['-FILES_LIST-']]
+            if list_value:
+                display_number=list_value[0]
+                if self.event_key_js['found'] == '-MOVE_UP_LIST-':
+                    display_values = self.files_list_mgr.move_up(self.section_key,display_number)
+                elif self.event_key_js['found'] == '-MOVE_DOWN_LIST-':
+                    display_values = self.files_list_mgr.move_down(self.section_key,display_number)
+                elif self.event_key_js['found'] == '-REMOVE_FROM_LIST-':
+                    display_values = self.files_list_mgr.remove_item(self.section_key,display_number)
+                self.window[self.event_key_js['-FILES_LIST-']].update(display_values)
         if self.event_key_js['found'] == '-ADD_TO_LIST-':
+            
+            self.files_list_mgr.check_files_list_key(self.section_key)
             file_list = self.values[self.event_key_js['-BROWSER_LIST-']]
-            files_list = self.values[self.event_key_js['-FILES_LIST-']] or []
+            path_dir = self.values[self.event_key_js['-DIR-']]
+            filename = file_list[0]
             if file_list:
-                files_list.append(file_list[0])
-            path_dir = self.values[self.event_key_js['-DIR-']].split(';')
-            for path in path_dir:
-                if path not in files_list:
-                    files_list.append(path)
-            self.window[self.event_key_js['-FILES_LIST-']].update(files_list)
+                file_path = os.path.join(path_dir,filename)
+                self.files_list_mgr.add_to_files_list_dict(self.section_key,file_path)
+                self.window[self.event_key_js['-FILES_LIST-']].update(self.files_list_mgr.return_display_names(self.section_key))
         if self.event_key_js['found'] == '-CLEAR_LIST-':
-            self.window[self.event_key_js['-FILES_LIST-']].update([])
+            self.window[self.event_key_js['-FILES_LIST-']].update(self.files_list_mgr.clear_list(key))
         if self.event_key_js['found'] == "-BROWSE_BACKWARDS-":
             # Navigate up to the parent directory
             if self.return_directory() not in self.history:

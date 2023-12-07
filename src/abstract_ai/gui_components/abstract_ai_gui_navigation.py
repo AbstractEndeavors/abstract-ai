@@ -1,10 +1,10 @@
 from abstract_gui import text_to_key
 class AbstractNavigationManager:  # Replace with your actual class name
-    def __init__(self,selfs,window_mgr):
+    def __init__(self,selfs,window_mgr)->None:
         self.window_mgr = window_mgr
         self.selfs =selfs
         self.action_keys = ['prompt_data','request','query','chunk','instructions']
-    def chunk_event_check(self):
+    def chunk_event_check(self)->None:
         """
         Checks if any events related to the chunk UI elements were triggered and performs the necessary actions.
         """
@@ -25,7 +25,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
         # Update the display based on the updated navigation data
         self.update_display(nav_data)
 
-    def parse_navigation_event(self, event):
+    def parse_navigation_event(self, event:str)->((None,None) or (str,str)):
         """
         Parses the event to extract navigation type and direction.
         """
@@ -37,7 +37,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
                 return nav_type, nav_direction
         return None, None
 
-    def get_navigation_data(self, navigation_type):
+    def get_navigation_data(self, navigation_type:str)->dict:
         """
         Retrieves the necessary data for navigation based on the navigation type.
         """
@@ -49,7 +49,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
         }
         return nav_data
 
-    def get_sub_section_number(self, navigation_type):
+    def get_sub_section_number(self, navigation_type:str)->int:
         """
         Retrieves the current sub-section number based on navigation type.
         """
@@ -58,7 +58,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
         self.number_key = f"-{navigation_type.upper()}{'_SECTION' if len(spl)>= 3 else ''}_NUMBER-"
         return int(self.window_mgr.get_from_value(self.number_key)) if self.window_mgr.exists(self.number_key) else None
 
-    def get_reference_object(self, navigation_type):
+    def get_reference_object(self, navigation_type:str)->list:
         """
         Retrieves the reference object based on navigation type.
         """
@@ -72,11 +72,11 @@ class AbstractNavigationManager:  # Replace with your actual class name
         }
         return reference_js.get(navigation_type, [])
 
-    def update_navigation_counters(self, nav_data, direction):
+    def update_navigation_counters(self, nav_data:dict, direction:str)->None:
         """
         Updates section and subsection numbers based on the navigation direction.
         """
-        def get_adjusted_number(current_number, reference_obj):
+        def get_adjusted_number(current_number:int, reference_obj:list)->int:
             return max(0, min(current_number, max(0, len(reference_obj))))
         reference_obj = nav_data['reference_object']
         current_section_number = self.selfs.display_number_tracker[nav_data['data_type']]
@@ -98,12 +98,12 @@ class AbstractNavigationManager:  # Replace with your actual class name
         self.update_display(nav_data)
 
     
-    def update_number_tracker(self,nav_data):
+    def update_number_tracker(self,nav_data:dict)->None:
         for key in self.action_keys:
             self.selfs.display_number_tracker[key]=nav_data["section_number"]
         self.selfs.display_number_tracker['chunk_number']=nav_data["number"]
         
-    def update_data_displays(self,nav_data):
+    def update_data_displays(self,nav_data:dict)->None:
         self.selfs.update_request_data_display(nav_data["section_number"])
         self.selfs.update_prompt_data_display(nav_data["section_number"])
         action_keys = ['chunk','query']
@@ -111,7 +111,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
         for action_key in self.action_keys:
             for number_type in number_types:
                 self.window_mgr.update_value(text_to_key(f'{action_key}_{number_type}'),nav_data[number_type])
-    def update_display(self, nav_data):
+    def update_display(self, nav_data:dict)->None:
         """
         Updates the display based on the navigation data.
         """
@@ -121,7 +121,6 @@ class AbstractNavigationManager:  # Replace with your actual class name
         chunk_section = max(0, min(nav_data['section_number'], len(self.selfs.prompt_mgr.chunk_token_distributions)-1))
         self.window_mgr.update_value(key='-QUERY-',value=self.selfs.prompt_mgr.create_prompt(chunk_token_distribution_number=chunk_section,chunk_number=0))
         self.selfs.update_chunk_info(nav_data['section_number'],nav_data["number"])
-        print(nav_data['number'])
         # Update the display logic here based on nav_data
         self.selfs.update_bool_instructions()
 
