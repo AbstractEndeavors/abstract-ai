@@ -1,2 +1,2 @@
-from GptManager import GptManager
+from .GptManager import GptManager
 GptManager()

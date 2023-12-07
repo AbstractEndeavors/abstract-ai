@@ -1,8 +1,7 @@
 # DEPENDENCIES #
 import os
 import pyperclip
-from __init__ import (RightClickManager,
-               get_total_layout,
+from . import (get_total_layout,
                instructions_keys,
                all_token_keys,
                test_options_keys,
@@ -17,14 +16,13 @@ from __init__ import (RightClickManager,
                read_from_file_with_multiple_encodings)
 
 from abstract_webtools import UrlManager, SafeRequest, url_grabber_component
-
+from .gui_components.abstract_browser import AbstractBrowser
 
 from abstract_gui import (
     get_event_key_js,
     text_to_key,
     AbstractWindowManager,
     NextReadManager,
-    AbstractBrowser,
     expandable
     
 )
@@ -125,7 +123,7 @@ class GptManager:
         Overall, this class manages each operation in the process of user interaction, query formation, API calling, and result displaying,
         thereby making customized and complex conversations with the GPT model possible.
     """
-    def __init__(self):
+    def __init__(self)->None:
         """
         initializes the GptManager. It starts by setting the window manager and defining a new window for the chat GPT console. The manager
         for API events is also initiated and the window starts listening for events. The method also initializes the managers for handling the
@@ -133,7 +131,7 @@ class GptManager:
         and kicks off the UI's main loop.
  	"""
         self.window_mgr = AbstractWindowManager()
-        self.window_name = self.window_mgr.add_window(window_name="Chat GPT Console",title="Chat GPT Console",layout=get_total_layout(),**expandable())
+        self.window_name = self.window_mgr.add_window(window_name="Chat GPT Console",title="Chat GPT Console",layout=get_total_layout(),window_height=0.7,window_width=0.8,**expandable())
         self.window_mgr.set_current_window(self.window_name)
         self.window = self.window_mgr.get_window_method(self.window_name)
         self.api_call_list=[]
@@ -154,7 +152,6 @@ class GptManager:
         self.thread_mgr = ThreadManager()
         self.history_mgr = HistoryManager()
         self.model_mgr = ModelManager()
-        self.right_click_mgr=RightClickManager()
         self.instruction_mgr = InstructionManager()
         self.request_data_list=['']
         self.prompt_data_list=['']
@@ -175,29 +172,32 @@ class GptManager:
         self.initialize_keys()
         self.loop_one=False
         self.bool_loop=False
+
         self.window_mgr.while_window(window_name=self.window_name, event_handlers=self.while_window)
         
     @staticmethod
-    def get_remainder(num):
+    def get_remainder(num:int) ->int: 
         return 100-int(num)
     
     @staticmethod
-    def get_new_line(num=1):
+    def get_new_line(num:int=1)->str:
         new_line = ''
         for i in range(num):
             new_line +='\n'
         return new_line
+    
     #text and bool handling
     @staticmethod
-    def get_bool_and_text_keys(key_list,sections_list=[]):
+    def get_bool_and_text_keys(key_list:list,sections_list:list=[])->list:
         keys = []
         for text in key_list:
             keys.append(text_to_key(text))
             for section in sections_list:
                 keys.append(text_to_key(text,section=section))
         return keys
+    
     @staticmethod
-    def read_file_contents(file_path):
+    def read_file_contents(file_path:str)->str:
         """
         Reads the contents of the file at the given path.
 
@@ -212,7 +212,7 @@ class GptManager:
         else:
             return read_from_file_with_multiple_encodings(file_path)
         
-    def initialize_keys(self):
+    def initialize_keys(self)->None:
         """sets up the necessary key definitions for handling events and values from the GUI. It defines the keys
         needed to check the event, the chunk history, the token percentage dropdowns, the instruction keys, and others.
         This is essential for the proper functioning and interaction of the GptManager with the GUI.
@@ -227,8 +227,7 @@ class GptManager:
                                  'query_event_check',
                                  'readme_event_check',
                                  'browser_event_query',
-                                 'prompt_request_event_check',
-                                 'right_click_event_query']
+                                 'prompt_request_event_check']
         self.sub_navigation_keys = [
                           text_to_key("chunk forward"),
                           text_to_key("chunk back"),
@@ -262,7 +261,15 @@ class GptManager:
         self.chunk_display_keys=self.get_bool_and_text_keys(
             all_token_keys
             )
-    def update_all(self):
+        self.default_instructions='''your response is expected to be in JSON format with the keys as follows:
+
+0) api_response - place response to prompt here
+1) suggestions - A parameter that allows the module to provide suggestions for improving efficiency in future prompt sequences. These suggestions will be reviewed by the user after the entire prompt sequence is fulfilled.
+2) generate_title - A parameter used for title generation of the chat. To maintain continuity, the generated title for a given sequence is shared with subsequent queries.
+
+below is an example of the expected json dictionary response format, with the default inputs:
+{"api_response": "", "suggestions": "", "generate_title": ""}'''
+    def update_all(self)->None:
         """
         updates all the needed managers. It updates the Model Manager, Instruction Manager, API Manager,
         Prompt Manager, and Response Manager with the values currently entered in the GUI.
@@ -273,10 +280,10 @@ class GptManager:
         self.update_response_mgr()
         self.check_test_bool()
 
-    def update_text(self):
+    def update_text(self)->None:
         self.update_prompt_mgr(**self.prompt_mgr_update_js)
         
-    def fill_lists(self):
+    def fill_lists(self)->None:
         if self.prompt_data_list[-1] != '' or self.request_data_list[-1] != '':
             self.prompt_data_list.append('')
             self.request_data_list.append('')
@@ -285,7 +292,7 @@ class GptManager:
             
 #ApiManagement:
     # Updates the API manager with new values from GUI    
-    def update_api_mgr(self):
+    def update_api_mgr(self)->None:
         """
         updates the API manager with new values from the GUI. The values include the API content type,
         header, environment, and key.
@@ -297,7 +304,7 @@ class GptManager:
 
 #ModelManagement
 # Updates model manager with latest model name from GUI
-    def update_model_mgr(self):
+    def update_model_mgr(self)->None:
         """
         updates the Model Manager with the latest model name from the GUI.
         """
@@ -307,19 +314,20 @@ class GptManager:
         self.window_mgr.update_value(key=text_to_key('max_tokens'),value=self.model_mgr.selected_max_tokens)
         
     # Checks for model related event and then updates model manager
-    def model_event_check(self):
+    def model_event_check(self)->None:
         """
         checks if there was a model-related event and, if there was, updates the Model Manager.
         """
         if self.event in "-MODEL-":
             self.update_model_mgr()
+            self.update_prompt_mgr()
         else:
             return False
         return True
  
 #PromptManagement
     # Initializes the prompt manager with the information needed for querying the GPT AI model
-    def update_prompt_mgr(self,prompt_data_list=None,request_data_list=None,chunk_token_distributions=None,completion_percentage=None,notation=None,chunk_number=None,chunk_type="CODE"):
+    def update_prompt_mgr(self,prompt_data_list:list=None,request_data_list:list=None,chunk_token_distributions:list=None,completion_percentage:(int or str)=None,notation:str=None,chunk_number:(int or str)=None,chunk_type:str="CODE")->(list,list):
         """
         initializes the prompt manager with the information needed for querying the GPT AI model.
 	"""
@@ -342,7 +350,8 @@ class GptManager:
                                      "request_data_list":self.request_data_list,
                                      "completion_percentage":None,
                                      "chunk_type":"CODE"}
-    def sanitize_prompt_and_request_data(self,request_data_list,prompt_data_list):
+        
+    def sanitize_prompt_and_request_data(self,request_data_list:list,prompt_data_list:list)->(list,list):
         request_data_list = request_data_list or self.request_data_list
         prompt_data_list = prompt_data_list or self.prompt_data_list
         for i in range(len(self.prompt_data_list)):
@@ -351,23 +360,24 @@ class GptManager:
                     prompt_data_list = prompt_data_list[:-1]
                     request_data_list = request_data_list[:-1]
         return request_data_list,prompt_data_list
-    def get_prompt_data_section_number(self):
+    
+    def get_prompt_data_section_number(self)->int:
         return int(self.window_mgr.get_values()[text_to_key("prompt_data section number")])
     
-    def get_chunk_token_distribution_number(self):
+    def get_chunk_token_distribution_number(self)->int:
         return int(self.window_mgr.get_values()[text_to_key("chunk section number")])
     
-    def get_chunk_number(self):
+    def get_chunk_number(self)->int:
         return int(self.window_mgr.get_values()[text_to_key("chunk number")])
     
-    def get_spec_section_number_display(self,variable_header):
+    def get_spec_section_number_display(self,variable_header:str)->int:
         value = self.display_number_tracker[variable_header]
         if not is_number(value):
             value = int(self.display_number_tracker[variable_header])
             self.window_mgr.update_value(key=text_to_key(f"{variable_header} section number"),value=value)
         return int(value)
     
-    def update_request_data_list(self,data=None):
+    def update_request_data_list(self,data:str=None)->None:
         spec_section_number = self.get_spec_section_number_display(variable_header='request')
         if data == None:
             self.request_data_list[spec_section_number] = self.window_mgr.get_values()[text_to_key('request')]
@@ -377,11 +387,13 @@ class GptManager:
 
         self.prompt_mgr_update_js['request_data_list']=self.request_data_list
         self.prompt_mgr.update_request_and_prompt_data(request_data = self.request_data_list)
-    def update_request_data_display(self,section_number=None):
+        
+    def update_request_data_display(self,section_number:int=None)->None:
         if section_number == None:
             section_number = self.get_spec_section_number_display(variable_header='request')
         self.window_mgr.update_value(key=text_to_key('request'),value=self.request_data_list[section_number])
-    def update_prompt_data_list(self,data=None):
+        
+    def update_prompt_data_list(self,data:str=None)->None:
         spec_section_number = self.get_spec_section_number_display(variable_header='prompt_data')
         if data == None:
             self.prompt_data_list[spec_section_number] = self.window_mgr.get_values()[text_to_key('prompt_data data')]
@@ -390,12 +402,12 @@ class GptManager:
             self.update_prompt_data_display()
         self.prompt_mgr_update_js['prompt_data_list']=self.prompt_data_list
         self.prompt_mgr.update_request_and_prompt_data(prompt_data = self.request_data_list,request_data = self.request_data_list)
-    def update_prompt_data_display(self,section_number=None):
+    def update_prompt_data_display(self,section_number:int=None)->None:
         if section_number == None:
             section_number = self.get_spec_section_number_display(variable_header='prompt_data')
         self.window_mgr.update_value(key=text_to_key('prompt_data data'),value=self.prompt_data_list[section_number])
         
-    def prompt_request_event_check(self):
+    def prompt_request_event_check(self)->bool:
         event_triggered = False
         if self.event == text_to_key('request'):
             self.update_request_data_list()
@@ -411,20 +423,20 @@ class GptManager:
         self.fill_lists()
         return True
     
-    def get_adjusted_number(self,current_number, reference_obj):
+    def get_adjusted_number(self,current_number:int, reference_obj:list)->int:
             return max(0, min(current_number, max(0, len(reference_obj)-1)))
         
-    def update_prompt_data(self,data):
+    def update_prompt_data(self,data:str)->list:
         self.history_mgr.add_to_history(name=self.chunk_history_name,data=self.prompt_data_list)
         self.update_prompt_data_list(data=data)
         return self.prompt_data_list
 
-    def update_request_data(self,data):
+    def update_request_data(self,data:str)->list:
         self.history_mgr.add_to_history(name=self.request_history_name,data=self.request_data_list)
         self.update_request_data_list(data=data)
         return self.request_data_list
 
-    def update_query_display(self):
+    def update_query_display(self)->None:
         section_number = self.get_adjusted_number(self.display_number_tracker['request'], self.prompt_mgr.chunk_token_distributions)
         chunk_number = self.get_adjusted_number(self.display_number_tracker['chunk_number'], self.prompt_mgr.chunk_token_distributions[section_number])
         self.display_number_tracker['query']=section_number
@@ -433,7 +445,7 @@ class GptManager:
         self.window_mgr.update_value(text_to_key(f'query number'),chunk_number)
         self.window_mgr.update_value(key='-QUERY-',value=self.prompt_mgr.create_prompt(chunk_token_distribution_number=section_number,chunk_number=chunk_number))
     
-    def update_chunk_info(self,chunk_token_distribution_number=0,chunk_number=0):
+    def update_chunk_info(self,chunk_token_distribution_number:(str or int)=0,chunk_number:(str or int)=0)->None:
         if self.prompt_mgr.chunk_token_distributions:
             
             chunk_token_distribution_number=self.get_adjusted_number(int(chunk_token_distribution_number),self.prompt_mgr.chunk_token_distributions)
@@ -447,7 +459,7 @@ class GptManager:
                         if spl[-1] in self.chunk_token_distribution[spl[0]]:
                             self.window_mgr.update_value(key=key,value=self.chunk_token_distribution[spl[0]][spl[-1]])
          
-    def add_to_chunk(self,content):
+    def add_to_chunk(self,content:str)->str:
         """
         adds the user's entered request to the request chunk. It also updates the 'chunk_text_number' in the GUI.
  	"""
@@ -461,7 +473,7 @@ class GptManager:
         return content
     
     ## chunk data keys
-    def chunk_event_check(self):
+    def chunk_event_check(self)->bool:
         """
         checks if any events related to the chunk UI elements were triggered and performs the necessary actions.
  	"""
@@ -523,7 +535,7 @@ class GptManager:
         
 #InstructionManagement
     # updates instructions manager with environment values from GUI      
-    def update_instruction_mgr(self):
+    def update_instruction_mgr(self)->None:
         """
         updates the Instruction Manager with the environment values from the GUI. If the '-instructions-'
         key in the UI is set, it also updates the Instruction Manager's attributes for each instruction key.
@@ -542,7 +554,8 @@ class GptManager:
         self.instruction_data_list[spec_num]['text']=instructions_display_text_value
         self.window_mgr.update_value(key="-INSTRUCTIONS_TEXT-",value=self.instruction_data_list[spec_num]['text'])
         self.prompt_mgr.update_request_and_prompt_data(instruction_data = self.instruction_data_list)
-    def update_bool_instructions(self):
+        
+    def update_bool_instructions(self)->None:
         spec_num = self.get_spec_section_number_display('request')
         self.instruction_data_list[spec_num]['bool_values']['api_response']=True
         for key in self.instruction_pre_keys:
@@ -552,14 +565,15 @@ class GptManager:
                 value = self.instruction_data_list[spec_num]['bool_values'][key]
             self.window_mgr.update_value(key=bool_key,value=value)
         self.window_mgr.update_value(key="-INSTRUCTIONS_TEXT-",value=self.instruction_data_list[spec_num]['text'])
-    def restore_instruction_defaults(self):
+        
+    def restore_instruction_defaults(self)->None:
         defaults = self.instruction_mgr.default_instructions
         for key in self.instruction_pre_keys:
             text_key = text_to_key(text=key,section="TEXT")
             if key in defaults:
                 self.window_mgr.update_value(key=text_key,value=defaults[key]['instruction'])
 
-    def delegate_instruction_text(self):
+    def delegate_instruction_text(self)->None:
         """
         updates the instructions section in the GUI with the values in the latest response. If the instruction
         key isn't in the GUI's value list, it appends the instruction to the '-other-' section of feedback in the GUI.
@@ -575,7 +589,7 @@ class GptManager:
             else:
                 self.window_mgr.update_value(key=instruction_key,value=value)
 
-    def instruction_event_check(self):
+    def instruction_event_check(self)->bool:
         """
         checks if there was an instruction-related event and updates the Instruction Manager if there was one.
         It then updates the Prompt Manager with the latest instructions.
@@ -589,13 +603,13 @@ class GptManager:
         return True
             
 #urlManagement
-    def append_output(self,key,new_content):
+    def append_output(self,key:str,new_content:str)->None:
         """
         appends a line of text to the 'other' section of feedback on the GUI.
  	"""
         self.window_mgr.update_value(key=key,value=self.window_mgr.get_from_value(key)+'\n\n'+new_content)
         
-    def get_url(self):
+    def get_url(self)->None:
         """
         retrieves the URL entered by the user in the corresponding input field of the UI.
  	"""
@@ -605,7 +619,7 @@ class GptManager:
             url = safe_list_return(url_list)
         return url
     
-    def get_url_manager(self,url=None):
+    def get_url_manager(self,url:str=None)->str:
         """
         returns the processed URL. It uses the UrlManager and SafeRequest classes from the abstract_webtools
         module to process and safe-proof the URL.
@@ -614,7 +628,7 @@ class GptManager:
         url_manager = UrlManager(url=url)    
         return url_manager
 
-    def url_event_check(self):
+    def url_event_check(self)->bool:
         """
         Checks if a URL event has been triggered.
 
@@ -664,10 +678,10 @@ class GptManager:
         return True
     
 #ResponseManagement
-    def update_response_mgr(self):
+    def update_response_mgr(self)->None:
         self.response_mgr = ResponseManager(prompt_mgr=self.prompt_mgr,api_mgr=self.api_mgr)
         
-    def get_new_api_call_name(self):
+    def get_new_api_call_name(self)->None:
         """
         A helper method that generates and appends a new unique API call name to the api_call_list.
  	"""
@@ -675,7 +689,7 @@ class GptManager:
         if call_name not in self.api_call_list:
             self.api_call_list.append(call_name)
     
-    def query_event_check(self):
+    def query_event_check(self)->bool:
         """
         checks if the '-SUBMIT_QUERY-' event was triggered. If it was, it creates a new API call name, initializes
         the query submission process, and submits the query using the submit_query method.
@@ -690,7 +704,7 @@ class GptManager:
             return False
         return True
     
-    def get_dots(self):
+    def get_dots(self)->None:
         """
         This is a helper method used in the update_progress_chunks method. It manages the progress tracking visual
         indication in the UI. It updates the dots string depending on the current state of the dots. If the dots string
@@ -714,7 +728,7 @@ class GptManager:
             status = "Updating Content" if not self.updated_progress else "Sending"
         self.window_mgr.update_value(key='-PROGRESS_TEXT-', value=f'{status}{self.dots}')
         
-    def update_progress_chunks(self,done=False):
+    def update_progress_chunks(self,done:bool=False)->None:
         """
         updates the progress bar and text status in the GUI, depending on the amount of chunks processed. If the
         process is completed, it updates the UI with a sent status and enables the '-SUBMIT_QUERY-' button again.
@@ -737,7 +751,7 @@ class GptManager:
             self.window_mgr.update_value(key='-QUERY_COUNT-', value=f"chunk {i_query} of {self.total_dists} being sent")
             
     # checks if the Response Manager has completed the query process.         
-    def check_response_mgr_status(self):
+    def check_response_mgr_status(self)->bool:
         """
         checks if the Response Manager has completed the query process. It returns a Boolean indicating the status.
 	"""
@@ -746,7 +760,7 @@ class GptManager:
         return self.start_query
     
     # Manages the process of submitting queries to the GPT AI
-    def submit_query(self):
+    def submit_query(self)->None:
         """
         manages the process of submitting queries to the GPT AI. It starts by disabling the '-SUBMIT_QUERY-'
         button and then starts a new thread for the get_query method. The method continues to update the progress
@@ -783,7 +797,7 @@ class GptManager:
             self.update_prompt_data('')
         self.response=False
         
-    def get_query(self):
+    def get_query(self)->None:
         """
         handles the operation of querying the AI model. It continues to query until a response is
         received or until the API call process is stopped.
@@ -796,7 +810,7 @@ class GptManager:
                 print('Response Recieved')
         self.thread_mgr.stop(self.api_call_list[-1],result=self.response)
 
-    def response_event_check(self):
+    def response_event_check(self)->bool:
         """
         Checks if a response event has been triggered.
 
@@ -827,7 +841,7 @@ class GptManager:
             return False
         return True
     
-    def get_output_response(self,model="None",title="None",request="None",response="None"):
+    def get_output_response(self,model:str="None",title:str="None",request:str="None",response:str="None")->str:
         """
         A helper method that formats the output string of a response in a clear and readable manner.
         It includes information about the model, title, user request, and AI response.
@@ -838,7 +852,7 @@ class GptManager:
         response = f"#RESPONSE#{self.get_new_line(2)}{str(response)}{self.get_new_line(2)}"
         return f"{model}{title}{request}{response}"
     
-    def update_text_with_responses(self):
+    def update_text_with_responses(self)->None:
         """
         gets the latest response from the AI, formats it using the get_output_response helper method,
         and updates the GUI's '-RESPONSE-' key with the formatted string.
@@ -862,7 +876,7 @@ class GptManager:
                                                                            title=self.last_title,
                                                                            request=self.request_data_list[self.get_current_request_data()],
                                                                            response=response_content))
-    def get_current_request_data(self):
+    def get_current_request_data(self)->int:
         num=0
         for i,data in enumerate(self.prompt_data_list):
             num+=len(data)
@@ -871,7 +885,7 @@ class GptManager:
                     return len(request_data_list)-1
                 return i
         return len(self.request_data_list)-1
-    def unlist_self(self,keys):
+    def unlist_self(self,keys:list):
         """
         A helper method that takes a list of keys as a parameter, iterates over each key, and checks if
         the value of the corresponding key in the class is a non-empty list. If it is, it updates the class's attribute with the last element in the list.
@@ -881,7 +895,7 @@ class GptManager:
             if isinstance(value,list) and value:
                 value = value[-1]
             setattr(self,key,value)
-    def initialize_output_display(self):
+    def initialize_output_display(self)->None:
         """
         Initializes the display of the latest output in the GUI.
         """
@@ -894,7 +908,7 @@ class GptManager:
         self.window_mgr.update_value(key='-RESPONSE_TEXT_NUMBER-',value=self.response_text_number_display)
         self.update_output(output_iteration=0)
         
-    def get_output_display_numbers(self):
+    def get_output_display_numbers(self)->None:
         """
         Retrieves the actual and display numbers of the current output for navigation purposes.
         """
@@ -916,7 +930,7 @@ class GptManager:
             if self.response_text_number_display < len(self.latest_output):
                 self.adjust_output_display(1)
                 
-    def update_output(self,output_iteration):
+    def update_output(self,output_iteration:int):
         """
         Updates the displayed output based on the given iteration.
 
@@ -927,13 +941,13 @@ class GptManager:
             self.current_output = self.latest_output[output_iteration]
             self.update_text_with_responses()
             
-    def adjust_output_display(self,num):
+    def adjust_output_display(self,num:int):
         self.response_text_number_actual+=num
         self.response_text_number_display+=num
         self.update_output(output_iteration=self.response_text_number_actual)
         self.window_mgr.update_value(key='-RESPONSE_TEXT_NUMBER-',value=self.response_text_number_display)
         
-    def listbox_event_check(self):
+    def listbox_event_check(self)->bool:
         """
         Checks if a listbox event has been triggered and updates the GUI accordingly.
 
@@ -975,10 +989,10 @@ class GptManager:
                 if file_path:
                     file_path = os.path.join(file_path,files_list[0])
                     if not os.path.isfile(file_path):
-                        self.browser_mgr.handle_event(self.window_mgr.get_values(),self.event,self.window)
-            return event_triggered
+                        self.browser_mgr.handle_event(self.event,self.window_mgr.get_values(),self.window)
+        return event_triggered
     
-    def update_last_response_file(self):
+    def update_last_response_file(self)->None:
         """
         Updates the path to the last file that recorded a response.
 
@@ -995,7 +1009,7 @@ class GptManager:
         self.window["-FILE_BROWSER_RESPONSES-"].InitialFolder=self.last_directory
         self.initialize_output_display()
         
-    def update_response_list_box(self):
+    def update_response_list_box(self)->None:
         """
         Update the List Box component that displays saved responses.
 
@@ -1014,7 +1028,7 @@ class GptManager:
             files_list=self.new_response_path_list+files_list
             self.window_mgr.update_value('-FILES_LIST_RESPONSES-',args={"values":files_list})
 
-    def aggregate_conversations(self,directory:str=None):
+    def aggregate_conversations(self,directory:str=None)->list:
         """
         Aggregates conversations from JSON files in the specified directory.
 
@@ -1057,7 +1071,7 @@ class GptManager:
         return aggregated_conversations
     
 #WindowManagement
-    def readme_event_check(self):
+    def readme_event_check(self)->bool:
         """
         Checks if the Generate README event has been triggered.
 
@@ -1092,7 +1106,7 @@ class GptManager:
             return False
         return True
     
-    def perform_event_checks(self):
+    def perform_event_checks(self)->None:
         """
         Iterates through the different event checks to see if any has been triggered.
 
@@ -1104,40 +1118,37 @@ class GptManager:
             self.bool_loop = method()
             
             # If you want to stop checking once bool_loop is True (or some condition), you can break here
-            if self.bool_loop:  # Assuming self.bool_loop should stop the loop when True
+            if self.bool_loop or self.event==None:  # Assuming self.bool_loop should stop the loop when True
                 break
         
 
-    def browser_event_query(self,values=None,event=None,window=None):
+    def browser_event_query(self,event:str=None,values:dict=None,window=None):
         values=values or self.window_mgr.get_values()
         event=event or self.window_mgr.get_event()
         window=window or self.window
         self.browser_mgr.handle_event(event,values,window)
-        
-    def right_click_event_query(self,values=None,event=None,window=None):
-        values=values or self.window_mgr.get_values()
-        event=event or self.window_mgr.get_event()
-        window=window or self.window
-        self.right_click_mgr.right_click_event(event,values,window)
+
         
     def while_window(self,event,values,window):
-        print(event)
         self.event,self.values,window=event,values,window
-        if self.loop_one == False:
-            
-            self.update_all()
-            self.restore_instruction_defaults()
-            for browser_event in ['-SCAN_FILES-',
-                                  '-SCAN_RESPONSES-']:
-                self.browser_event_query(self.values,browser_event,self.window)
-            
-        self.next_read_mgr.execute_queue()
-        self.script_event_js = get_event_key_js(event = self.event,key_list=self.additions_key_list)
-        self.perform_event_checks()
-        self.loop_one=True
+        if self.event != None:
+            if self.loop_one == False:
+                
+                self.update_all()
+                self.restore_instruction_defaults()
+                self.update_instruction_mgr()
+                self.window_mgr.update_value(key="-INSTRUCTIONS_TEXT-",value=self.default_instructions)
+                for browser_event in ['-SCAN_FILES-',
+                                      '-SCAN_RESPONSES-']:
+                    self.browser_event_query(browser_event,self.values,self.window)
+                
+            self.next_read_mgr.execute_queue()
+            self.script_event_js = get_event_key_js(event = self.event,key_list=self.additions_key_list)
+            self.perform_event_checks()
+            self.loop_one=True
         
 #TestManagement
-    def check_test_bool(self):
+    def check_test_bool(self)->None:
         """
         Checks the status of the `self.test_bool` attribute.
 
@@ -1150,14 +1161,15 @@ class GptManager:
                 self.test_bool=self.window_mgr.get_values()['-TEST_RUN-']
                 if self.test_bool:
                     status_color = "green"
-                    self.window_mgr.update_value(key='-PROGRESS_TEXT-', value='TESTING')
+                    value = 'TESTING'
                     if self.test_file_path:
                         self.test_bool=os.path.isfile(self.test_file_path)
                 else:
-                    status_color = "light blue" 
-                    self.window_mgr.update_value(key='-PROGRESS_TEXT-', value='Awaiting Prompt')
-                self.window_mgr.update_value(key='-PROGRESS_TEXT-', args={"value":'TESTING',"background_color":status_color})
-    def test_event_check(self):
+                    status_color = "light blue"
+                    value = 'Awaiting Prompt'
+                self.window_mgr.update_value(key='-PROGRESS_TEXT-', args={"value":value,"background_color":status_color})
+                
+    def test_event_check(self)->bool:
         """
         Checks if a testing event has been triggered.
 
