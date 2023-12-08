@@ -71,10 +71,10 @@ class SaveManager:
                 title = title[:max_length]
 
             return title
-            def save_to_file(self, data:dict, file_path:str)->None:
-                # Assuming `data` is already a dictionary, we convert it to a JSON string and save.
-                with open(file_path, 'w', encoding='utf-8') as file:
-                    json.dump(data, file, ensure_ascii=False, indent=4)
+    def save_to_file(self, data:dict, file_path:str)->None:
+        # Assuming `data` is already a dictionary, we convert it to a JSON string and save.
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
     
     @staticmethod
     def read_saved_json(file_path:str)->dict:
