@@ -91,7 +91,21 @@ def collate_responses(directory:(str),response_keys:(str or list)=[]):
                 response_data_list.append(response_data)
         response_num = prompt_content.get('chunk_num',0)
         description_data[title][response_num] = '\n'.join(clean_list(response_data_list))
-        input(description_data[title])
+
     for key,values in description_data.items():
         description_data[key]='\n'.join(clean_list(values))
     return description_data
+def get_api_response_value(response):
+    response = make_list(get_any_value(response,'content') or None)[-1] or response
+    response = safe_json_loads(response)
+    if not isinstance(response,dict):
+        generate_title = "generate_title"
+        api_response = "api_response"
+        result = response
+        if generate_title in result:
+            result = result.split(generate_title)[0]
+            result = result.split(api_response)[-1]
+            result = eatAll(result,[':',',','"',"'",' ','\n','\t'])
+    else:
+        result = response.get('api_response',response)
+    return result

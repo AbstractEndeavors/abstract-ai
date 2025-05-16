@@ -1,3 +1,4 @@
+from .all_models import XAI_MODELS,OPENAI_MODELS
 class ModelManager:
     """
     This class manages the selection and querying of models available for use.
@@ -16,26 +17,8 @@ class ModelManager:
         _get_max_tokens_by_model(model_name): Returns the maximum tokens associated with the specified model.
     """
     def __init__(self, input_model_name:str=None, input_endpoint:str=None, default_selection:bool=True)->None:
-
-        self.all_models = [{'model': 'whisper-1', 'endpoint': 'https://api.openai.com/v1/audio/transcriptions', 'tokens': None},
-                       {'model': 'whisper-1', 'endpoint': 'https://api.openai.com/v1/audio/translations', 'tokens': None},
-                       {'model': 'gpt-4', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 8192},
-                       {'model': 'gpt-4-0613', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 8192},
-                       {'model': 'gpt-4-32k', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 32768},
-                       {'model': 'gpt-4-32k-0613', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 32768},
-                       {'model': 'gpt-3.5-turbo', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 8001},
-                       {'model': 'gpt-3.5-turbo-0613', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 4097},
-                       {'model': 'gpt-3.5-turbo-16k', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 16385},
-                       {'model': 'gpt-3.5-turbo-16k-0613', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 16385},
-                       {'model': 'gpt-3.5-turbo-instruct', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 4097},
-                       {'model': 'babbage-002', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 16384},
-                       {'model': 'davinci-002', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 16384},
-                       {'model': 'text-embedding-ada-002', 'endpoint': 'https://api.openai.com/v1/embeddings', 'tokens': None},
-                       {'model': 'gpt-3.5-turbo', 'endpoint': 'https://api.openai.com/v1/fine_tuning/jobs', 'tokens': 8001},
-                       {'model': 'babbage-002', 'endpoint': 'https://api.openai.com/v1/fine_tuning/jobs', 'tokens': 16384},
-                       {'model': 'davinci-002', 'endpoint': 'https://api.openai.com/v1/fine_tuning/jobs', 'tokens': 16384},
-                       {'model': 'text-moderation-stable', 'endpoint': 'https://api.openai.com/v1/moderations', 'tokens': 2049},
-                       {'model': 'text-moderation-latest', 'endpoint': 'https://api.openai.com/v1/moderations', 'tokens': 2049}]
+        
+        self.all_models = XAI_MODELS+OPENAI_MODELS
         self.all_model_names=self.get_all_values('model')
         self.all_endpoints=self.get_all_values('endpoint')
         self.default_model_info = {'model': 'gpt-4', 'endpoint': 'https://api.openai.com/v1/chat/completions', 'tokens': 8192}

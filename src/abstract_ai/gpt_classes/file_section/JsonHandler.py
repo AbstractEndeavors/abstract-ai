@@ -76,7 +76,7 @@ def postprocess_string(s):
     s = s.replace('\\"', '*<d<*')
     s = s.replace('"', "'")
     s = s.replace("*<d<*", '\\"')
-    input(s)
+
     return s
 def replace(data):
     return re.sub(r"(\s*'\s*|\s*'\s*:\s*'\s*|\s*'\s*,\s*'\s*)", lambda x: x.group().replace("'", '*<s<*'), data)
@@ -96,7 +96,7 @@ def get_any_value_converter(output,key,return_dict=False,replacements=None):
         value = get_any_value(data_json,key)
         # Example of processing and then converting back to a string
         output_string = json.dumps(value, indent=4)
-        input(output_string)
+
         output_string=postprocess_string(output_string.replace(replacements,"'"))
         return_desired_dict=data_json
     except json.JSONDecodeError as e:

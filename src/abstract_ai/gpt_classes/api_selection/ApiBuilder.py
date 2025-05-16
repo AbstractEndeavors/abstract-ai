@@ -17,9 +17,11 @@ class ApiManager:
         load_openai_key(): Loads the OpenAI API key for use in requests.
         get_header(): Generates the request headers for the API calls.
     """
-    def __init__(self,content_type=None,header=None,api_env:str=None,api_key:str=None)->None:
+    def __init__(self,api_key:str=None,api_env:str=None,content_type=None,header=None,env_path=None,endpoint=None)->None:
+        self.ai = "GROK" if (endpoint and 'x.ai' in endpoint) else "OPENAI"
         self.content_type=content_type or 'application/json'
-        self.api_env=api_env or 'OPENAI_API_KEY'
+        self.api_env=api_env or f'{self.ai}_API_KEY'
+        self.env_path = env_path
         self.api_key=api_key or self.get_openai_key()
         self.header=header or self.get_header()
         self.load_openai_key()
@@ -34,7 +36,7 @@ class ApiManager:
         Returns:
             str: The OpenAI API key.
         """
-        return get_env_value(key=self.api_env)
+        return get_env_value(key=self.api_env,path=self.env_path)
     def load_openai_key(self)->None:
         """
         Loads the OpenAI API key for authentication.
