@@ -1,0 +1,22 @@
+{
+    "solanaDeveloper":{
+        "channels":[1273790602646913106,1273039478146994208],
+        "uniqueWords":["solana","sol","solscan","solders","pump.fun","pumpfun"],
+        "deviation":"true"
+    },
+    "CryptoTA":{
+        "channels":[1198482290452480060],
+        "uniqueWords":["technicalanalysis","charts","TA","heatmap","trends"],
+        "deviation":"true"
+    },
+    "apiDeveloper":{
+        "channels":[1200093188996747287,1298723697783341109],
+        "uniqueWords":["api","flask","flaskapi","apis","axios","webhook"],
+        "deviation":"true"
+    },
+    "dataScientist":{
+        "channels":[1285343809055625337],
+        "uniqueWords":["db","database","catalyst","mortgage","DNC","livetransfer","data","moortgage"],
+        "deviation":"false"
+    }
+}
