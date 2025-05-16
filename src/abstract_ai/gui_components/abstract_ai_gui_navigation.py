@@ -100,6 +100,7 @@ class AbstractNavigationManager:  # Replace with your actual class name
     
     def update_number_tracker(self,nav_data:dict)->None:
         for key in self.action_keys:
+            #print(f"key: {key} in self.action_keys: {self.action_keys}")
             self.selfs.display_number_tracker[key]=nav_data["section_number"]
         self.selfs.display_number_tracker['chunk_number']=nav_data["number"]
         
@@ -109,15 +110,30 @@ class AbstractNavigationManager:  # Replace with your actual class name
         action_keys = ['chunk','query']
         number_types = ['section_number','number']
         for action_key in self.action_keys:
+            #print(f"action_key: {action_key} in self.action_keys: {self.action_keys}\n\n")
             for number_type in number_types:
+                #print(f"number_type: {number_type} in number_types: {number_types}\n\n")
+                #print(f"updating nav_data[number_type]: {nav_data[number_type]}\n\n")
                 self.window_mgr.update_value(text_to_key(f'{action_key}_{number_type}'),nav_data[number_type])
     def update_display(self, nav_data:dict)->None:
         """
         Updates the display based on the navigation data.
         """
+        #print(f"nav_data == {nav_data}\n\n")
         self.update_number_tracker(nav_data)
+        
         self.update_data_displays(nav_data)
-        #self.window_mgr.update_value("-CHUNK_SECTIONED_DATA-",self.selfs.prompt_mgr.chunk_token_distributions[nav_data["section_number"]][0]['chunk']['data'])
+        section_number = nav_data["section_number"]
+        #print(f"section_number: {section_number}\n\n")
+        #print(f"self.selfs.prompt_mgr.chunk_token_distributions == {self.selfs.prompt_mgr.chunk_token_distributions}\n\n")
+        chunk_section = max(0, min(section_number, len(self.selfs.prompt_mgr.chunk_token_distributions)-1))
+        chunk_token_distributions = self.selfs.prompt_mgr.chunk_token_distributions[chunk_section]
+        #print(f"chunk_token_distributions: {chunk_token_distributions}\n\n")
+        base_chunk_token_distribution = chunk_token_distributions[0]
+        #print(f"base_chunk_token_distribution: {base_chunk_token_distribution}\n\n")
+        base_chunk_data_token_distribution = base_chunk_token_distribution['chunk']['data']
+        #print(f"base_chunk_data_token_distribution: {base_chunk_data_token_distribution}\n\n")
+        self.window_mgr.update_value("-CHUNK_SECTIONED_DATA-",base_chunk_data_token_distribution)
         chunk_section = max(0, min(nav_data['section_number'], len(self.selfs.prompt_mgr.chunk_token_distributions)-1))
         self.window_mgr.update_value(key='-QUERY-',value=self.selfs.prompt_mgr.create_prompt(chunk_token_distribution_number=chunk_section,chunk_number=0))
         self.selfs.update_chunk_info(nav_data['section_number'],nav_data["number"])
