@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 setuptools.setup(
     name='abstract_ai',
-    version='0.1.8.65',
+    version='0.2.1.110',
     author='putkoff',
     author_email='partners@abstractendeavors.com',
     description="abstract_ai is a Python module that serves as a bridge between your application and the OpenAI GPT-3 API. It provides a convenient interface for sending requests, managing responses, and controlling the behavior of the API calls. This module is highly customizable, allowing you to establish prompts, instructions, and response handling logic.",
@@ -18,7 +18,7 @@ setuptools.setup(
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.11',
       ],
-    install_requires=['abstract_security>=0.0.1', 'abstract_webtools>=0.1.4.90', 'tiktoken>=0.5.1', 'abstract_utilities>=0.2.2.1', 'abstract_gui>=0.0.60.0', 'pyperclip>=1.8.2', 'openai>=0.28.1', 'requests>=2.31.0', 'nltk>=3.8.1'],
+    install_requires=['abstract_database','abstract_security>=0.0.1', 'abstract_webtools>=0.1.4.90', 'tiktoken>=0.5.1', 'abstract_utilities>=0.2.2.1', 'abstract_gui>=0.0.60.0', 'pyperclip>=1.8.2', 'openai>=0.28.1', 'requests>=2.31.0', 'nltk>=3.8.1','python-docx'],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
