@@ -1,0 +1,13 @@
+
+build/
+dist/
+logs/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+*.whl
+*.tar.gz
+*.asc
+.env
+.venv/
