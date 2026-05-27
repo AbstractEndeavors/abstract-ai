@@ -1,5 +1,5 @@
 import openai
-from abstract_security.envy_it import get_env_value
+from abstract_security import get_env_value
 class ApiManager:
     """
     This class handles the management of OpenAI API keys and headers.
