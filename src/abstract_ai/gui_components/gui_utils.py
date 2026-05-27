@@ -2,7 +2,7 @@ import os
 from abstract_utilities import get_closest_match_from_list
 from abstract_utilities.list_utils import ensure_nested_list,find_original_case
 from abstract_utilities.class_utils import get_all_functions_for_instance,get_all_params,get_fun
-from abstract_gui import make_component,AbstractWindowManager,AbstractBrowser,text_to_key,ensure_nested_list,expandable,RightClickManager,get_screen_dimensions
+from abstract_gui.SIMPLE_GUI import make_component,AbstractWindowManager,AbstractBrowser,text_to_key,ensure_nested_list,expandable,RightClickManager,get_screen_dimensions
 right_click_mgr=RightClickManager()
 def get_standard_screen_dimensions(width=0.70,height=0.80):
     return get_screen_dimensions(width=width,height=height)
