@@ -5,7 +5,7 @@ from ..model_selection import *
 from ..instruction_selection import *
 from ..api_selection import *
 from ...specializations import *
-from abstract_database.dbManager import DatabaseManager
+from abstract_database import DatabaseManager
 import asyncio
 import os
 import glob
