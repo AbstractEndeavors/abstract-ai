@@ -1,4 +1,4 @@
-from abstract_gui import text_to_key
+from abstract_gui.SIMPLEGUI.old import text_to_key
 class AbstractNavigationManager:  # Replace with your actual class name
     def __init__(self,selfs,window_mgr)->None:
         self.window_mgr = window_mgr
