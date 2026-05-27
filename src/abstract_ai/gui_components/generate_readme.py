@@ -1,4 +1,4 @@
-from abstract_gui import expandable,make_component,ensure_nested_list 
+from abstract_gui.SIMPLEGUI.old import expandable,make_component,ensure_nested_list 
 from os.path import basename
 import os
 def clean_list(list_obj:list=[])->list:
